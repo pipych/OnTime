@@ -33,19 +33,12 @@ npm run dev
 
 ## 📦 Деплой на Vercel через GitHub
 
-1. **Создайте репозиторий на GitHub** (например, `vchasno-miniapp`) и отправьте код:
-   ```bash
-   git init
-   git add .
-   git commit -m "feat: initial release of Vchasno Telegram Mini App"
-   git branch -M main
-   git remote add origin https://github.com/<ваш-username>/vchasno-miniapp.git
-   git push -u origin main
-   ```
+1. **Репозиторий проекта на GitHub:**
+   [https://github.com/pipych/OnTime](https://github.com/pipych/OnTime)
 
 2. **Подключите в Vercel:**
    - Перейдите на [vercel.com](https://vercel.com) и нажмите **Add New Project**.
-   - Выберите ваш репозиторий `vchasno-miniapp`.
+   - Выберите репозиторий `pipych/OnTime`.
    - Нажмите **Deploy** (настройки определятся автоматически: Vite, Output: `dist`).
    - (Опционально) Добавьте переменную окружения `VITE_GAS_API_URL` со ссылкой на опубликованный Google Apps Script Web App.
 
