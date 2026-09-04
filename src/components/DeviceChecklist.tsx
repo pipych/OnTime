@@ -169,7 +169,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
                   'w-9 h-9 rounded-full flex items-center justify-center transition-all duration-250 flex-shrink-0',
                   isCharged
                     ? 'bg-ios-green text-white shadow-glow-green scale-105'
-                    : 'bg-ios-item-bg hover:bg-ios-item-hover text-transparent'
+                    : 'border-2 border-black/20 dark:border-white/25 hover:border-ios-green/50 bg-transparent text-transparent'
                 )}
                 aria-label={isCharged ? t.chargedStatus : t.pendingStatus}
               >
