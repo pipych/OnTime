@@ -4,6 +4,7 @@ import type { DayInfo, DeviceKey } from '../types';
 import { DEVICES } from '../constants/devices';
 import { SFSymbol } from './SFSymbol';
 import { triggerSideCannonsConfetti } from '../utils/confetti';
+import { useI18n } from '../context/I18nContext';
 
 interface DeviceChecklistProps {
   day: DayInfo;
@@ -20,6 +21,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
   onChargeAll,
   sundayUnchargedItems = [],
 }) => {
+  const { lang, t } = useI18n();
   const isSunday = day.dayOfWeek === 0;
 
   // For Sunday, include Sunday items + any uncharged items of the week
@@ -86,8 +88,8 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
             className="w-6 h-6 flex-shrink-0 mt-0.5 text-ios-red"
           />
           <div className="text-[13px] leading-snug">
-            <span className="font-semibold block mb-0.5">Воскресный аудит зарядок!</span>
-            Эти устройства не заряжались на текущей неделе. Зарядите их сегодня, чтобы избежать штрафа.
+            <span className="font-semibold block mb-0.5">{t.sundayAuditTitle}</span>
+            {t.sundayAuditDesc}
           </div>
         </div>
       )}
@@ -99,6 +101,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
           if (!device) return null;
 
           const isCharged = !!charges[`CHG_${day.weekId}_${key}`];
+          const deviceName = lang === 'uk' ? device.nameUk : device.nameRu;
 
           return (
             <div
@@ -127,7 +130,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
                         ? 'text-ios-red'
                         : 'text-ios-text'
                     )}
-                    alt={device.nameRu}
+                    alt={deviceName}
                   />
                 </div>
 
@@ -139,17 +142,17 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
                         isCharged ? 'text-ios-text line-through opacity-80' : 'text-ios-text'
                       )}
                     >
-                      {device.nameRu}
+                      {deviceName}
                     </span>
                     {isSundayDebt && (
                       <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-ios-red/20 text-ios-red">
-                        Долг
+                        {t.debtBadge}
                       </span>
                     )}
                   </div>
                   <div className="text-[12px]">
                     <span className={isCharged ? 'text-ios-green font-medium' : 'text-ios-textSecondary'}>
-                      {isCharged ? 'Заряжено' : 'Ожидает зарядки'}
+                      {isCharged ? t.chargedStatus : t.pendingStatus}
                     </span>
                   </div>
                 </div>
@@ -168,7 +171,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
                     ? 'bg-ios-green text-white shadow-glow-green scale-105'
                     : 'border-2 border-ios-border hover:border-ios-accent text-transparent'
                 )}
-                aria-label={isCharged ? 'Отмечено' : 'Не отмечено'}
+                aria-label={isCharged ? t.chargedStatus : t.pendingStatus}
               >
                 <SFSymbol
                   src="/symbols/SVG_Vector/38_status_on.svg"
@@ -191,7 +194,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
               src="/symbols/SVG_Vector/37_status_all_charged.svg"
               className="w-5 h-5 text-white"
             />
-            <span>Всё заряжено</span>
+            <span>{t.allChargedBtn}</span>
           </button>
         </div>
       )}
@@ -206,15 +209,15 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
             } catch (_) {}
           }}
           className="py-6 flex flex-col items-center justify-center text-center animate-fadeIn cursor-pointer active:scale-95 transition-transform select-none"
-          title="Нажмите для праздничного конфетти 🎉"
+          title="🎉"
         >
           <SFSymbol
             src="/symbols/SVG_Vector/41_battery_100.svg"
             className="w-20 h-12 text-ios-textSecondary mb-2.5"
-            alt="На сегодня все заряжено!"
+            alt={t.allChargedOnToday}
           />
           <span className="text-[16px] font-semibold text-ios-textSecondary">
-            На сегодня все заряжено!
+            {t.allChargedOnToday}
           </span>
         </div>
       )}

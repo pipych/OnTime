@@ -9,6 +9,8 @@ interface WeekStripProps {
   charges: Record<string, boolean>;
   onPrevWeek?: () => void;
   onNextWeek?: () => void;
+  canPrev?: boolean;
+  canNext?: boolean;
   onToday?: () => void;
   weekRangeStr?: string;
   slideDirection?: 'left' | 'right' | null;
@@ -21,6 +23,8 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
   charges,
   onPrevWeek,
   onNextWeek,
+  canPrev = true,
+  canNext = true,
   slideDirection = null,
 }) => {
   const [touchStartX, setTouchStartX] = React.useState<number | null>(null);
@@ -42,9 +46,9 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
     // Minimum swipe threshold of 40px and predominantly horizontal
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
       if (deltaX < 0) {
-        onNextWeek?.();
+        if (canNext) onNextWeek?.();
       } else {
-        onPrevWeek?.();
+        if (canPrev) onPrevWeek?.();
       }
     }
 

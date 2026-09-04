@@ -1,11 +1,18 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import clsx from 'clsx';
 import type { DayInfo, DeviceKey } from '../types';
-import { getDaysForWeek, getWeekId, formatISODate } from '../utils/date';
+import {
+  getDaysForWeek,
+  getWeekId,
+  formatISODate,
+  canNavigatePrevWeek,
+  canNavigateNextWeek,
+} from '../utils/date';
 import { WeekStrip } from '../components/WeekStrip';
 import { DeviceChecklist } from '../components/DeviceChecklist';
 import { SFSymbol } from '../components/SFSymbol';
-import { CHARGE_DAYS_MAP, DAYS_SHORT_RU } from '../constants/devices';
+import { CHARGE_DAYS_MAP } from '../constants/devices';
+import { useI18n } from '../context/I18nContext';
 import {
   fetchChargesFromGAS,
   toggleChargeGAS,
@@ -25,6 +32,8 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
   onHapticSuccess,
   onHapticSelection,
 }) => {
+  const { lang, t } = useI18n();
+
   // Current active date reference
   const [referenceDate, setReferenceDate] = useState<Date>(() => new Date());
   
@@ -33,23 +42,36 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     formatISODate(new Date())
   );
 
-  // Charges map: { "CHG_2026_W36_ITEM_TWS": true, ... }
-  const [charges, setCharges] = useState<Record<string, boolean>>(() =>
-    getLocalCharges(getWeekId(new Date()))
-  );
+  // Charges map: accumulates charges for all loaded weeks
+  const [charges, setCharges] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    const now = new Date();
+    for (let offset = -2; offset <= 1; offset++) {
+      const d = new Date(now.getTime() + offset * 7 * 86400000);
+      const wId = getWeekId(d);
+      const cached = getLocalCharges(wId);
+      Object.assign(initial, cached);
+    }
+    return initial;
+  });
 
-  // Days list for the current week
+  // Days list for the current week (localized)
   const weekDays = useMemo(() => {
-    return getDaysForWeek(referenceDate);
-  }, [referenceDate]);
+    return getDaysForWeek(referenceDate, lang);
+  }, [referenceDate, lang]);
 
   const currentWeekId = useMemo(() => {
     return getWeekId(referenceDate);
   }, [referenceDate]);
 
-  // Today's date reference for header display (strictly today's calendar date)
-  const todayDayNumber = new Date().getDate();
-  const todayShortName = DAYS_SHORT_RU[new Date().getDay()];
+  // Today's date reference for header display (strictly today's calendar date, localized)
+  const now = new Date();
+  const todayDayNumber = now.getDate();
+  const todayShortName = t.daysShort[now.getDay()];
+
+  // Allowed navigation bounds (-2 past weeks, +1 future week)
+  const canPrev = useMemo(() => canNavigatePrevWeek(referenceDate), [referenceDate]);
+  const canNext = useMemo(() => canNavigateNextWeek(referenceDate), [referenceDate]);
 
   // The currently selected day object
   const selectedDay = useMemo(() => {
@@ -92,18 +114,36 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     ? Math.round((selectedChargedCount / selectedTotalCount) * 100)
     : 0;
 
+  const activeWeekRef = useRef<string>(currentWeekId);
+  activeWeekRef.current = currentWeekId;
+
   // Load charges from cache & GAS
   const loadCharges = useCallback(async () => {
-    // 1. Instant load from local cache
-    const local = getLocalCharges(currentWeekId);
-    setCharges(local);
+    const targetWeek = currentWeekId;
+
+    // 1. Instant load from local cache without destroying other weeks
+    const local = getLocalCharges(targetWeek);
+    if (Object.keys(local).length > 0) {
+      setCharges((prev) => ({ ...prev, ...local }));
+    }
 
     // 2. Fetch from GAS
     const gasUrl = getGasApiUrl();
     if (gasUrl) {
       try {
-        const gasCharges = await fetchChargesFromGAS(currentWeekId);
-        setCharges(gasCharges);
+        const gasCharges = await fetchChargesFromGAS(targetWeek);
+        if (activeWeekRef.current === targetWeek) {
+          setCharges((prev) => {
+            const updated = { ...prev };
+            // Clean uncharged keys for targetWeek that are no longer true
+            for (const k in updated) {
+              if (k.startsWith(`CHG_${targetWeek}_`) && !gasCharges[k]) {
+                delete updated[k];
+              }
+            }
+            return { ...updated, ...gasCharges };
+          });
+        }
       } catch (e) {
         // Cached local charges remain active
       }
@@ -126,6 +166,24 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
       window.removeEventListener('focus', handleVisibilityChange);
     };
   }, [loadCharges]);
+
+  // Preload all allowed weeks (-2, -1, 0, +1) on initial mount to eliminate navigation lag
+  useEffect(() => {
+    const allowedOffsets = [-2, -1, 0, 1];
+    const base = new Date();
+    allowedOffsets.forEach(async (offset) => {
+      const d = new Date(base.getTime() + offset * 7 * 86400000);
+      const wId = getWeekId(d);
+      if (wId !== currentWeekId) {
+        try {
+          const remote = await fetchChargesFromGAS(wId);
+          if (remote && Object.keys(remote).length > 0) {
+            setCharges((prev) => ({ ...prev, ...remote }));
+          }
+        } catch (_) {}
+      }
+    });
+  }, []);
 
   // Toggle single device
   const handleToggleDevice = (deviceKey: DeviceKey) => {
@@ -180,6 +238,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
   };
 
   const handlePrevWeek = () => {
+    if (!canPrev) return;
     onHapticImpact?.('light');
     setSlideDirection('left');
     const d = new Date(referenceDate.getTime());
@@ -189,6 +248,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
   };
 
   const handleNextWeek = () => {
+    if (!canNext) return;
     onHapticImpact?.('light');
     setSlideDirection('right');
     const d = new Date(referenceDate.getTime());
@@ -214,8 +274,14 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
         <div className="flex items-center gap-1.5">
           <button
             onClick={handlePrevWeek}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-all shadow-sm"
-            aria-label="Предыдущая неделя"
+            disabled={!canPrev}
+            className={clsx(
+              "w-10 h-10 rounded-full flex items-center justify-center bg-ios-card border border-ios-border transition-all shadow-sm",
+              canPrev
+                ? "text-ios-textSecondary hover:text-ios-text active:scale-90"
+                : "opacity-25 pointer-events-none cursor-not-allowed"
+            )}
+            aria-label={t.prevWeek}
           >
             <SFSymbol
               src="/symbols/SVG_Vector/15_back_chevron.svg"
@@ -224,8 +290,14 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
           </button>
           <button
             onClick={handleNextWeek}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-all shadow-sm"
-            aria-label="Следующая неделя"
+            disabled={!canNext}
+            className={clsx(
+              "w-10 h-10 rounded-full flex items-center justify-center bg-ios-card border border-ios-border transition-all shadow-sm",
+              canNext
+                ? "text-ios-textSecondary hover:text-ios-text active:scale-90"
+                : "opacity-25 pointer-events-none cursor-not-allowed"
+            )}
+            aria-label={t.nextWeek}
           >
             <SFSymbol
               src="/symbols/SVG_Vector/15_back_chevron.svg"
@@ -243,6 +315,8 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
         charges={charges}
         onPrevWeek={handlePrevWeek}
         onNextWeek={handleNextWeek}
+        canPrev={canPrev}
+        canNext={canNext}
         slideDirection={slideDirection}
       />
 

@@ -1,5 +1,32 @@
-import { CHARGE_DAYS_MAP, DAYS_FULL_RU, DAYS_SHORT_RU, MONTHS_GENITIVE_RU, MONTHS_RU } from '../constants/devices';
+import { CHARGE_DAYS_MAP, MONTHS_GENITIVE_RU, MONTHS_RU } from '../constants/devices';
+import { TRANSLATIONS, type Language } from '../constants/i18n';
 import type { DayInfo } from '../types';
+
+export const MIN_WEEK_OFFSET = -2; // Allowed: 2 weeks in past (-2, -1)
+export const MAX_WEEK_OFFSET = 1;  // Allowed: 1 week in future (+1)
+
+export function getMondayOfWeek(d: Date): Date {
+  const date = new Date(d.getTime());
+  date.setHours(0, 0, 0, 0);
+  const day = date.getDay() || 7;
+  date.setDate(date.getDate() - day + 1);
+  return date;
+}
+
+export function getWeekOffset(targetDate: Date, baseDate: Date = new Date()): number {
+  const mTarget = getMondayOfWeek(targetDate);
+  const mBase = getMondayOfWeek(baseDate);
+  const diffMs = mTarget.getTime() - mBase.getTime();
+  return Math.round(diffMs / (7 * 86400000));
+}
+
+export function canNavigatePrevWeek(currentDate: Date, baseDate: Date = new Date()): boolean {
+  return getWeekOffset(currentDate, baseDate) > MIN_WEEK_OFFSET;
+}
+
+export function canNavigateNextWeek(currentDate: Date, baseDate: Date = new Date()): boolean {
+  return getWeekOffset(currentDate, baseDate) < MAX_WEEK_OFFSET;
+}
 
 export function getWeekId(dateObj?: Date): string {
   const d = dateObj ? new Date(dateObj.getTime()) : new Date();
@@ -32,7 +59,7 @@ export function getWeekRangeStr(dateObj: Date): string {
   return `${f(mon)} — ${f(sun)}`;
 }
 
-export function getDaysForWeek(referenceDate: Date = new Date()): DayInfo[] {
+export function getDaysForWeek(referenceDate: Date = new Date(), lang: Language = 'ru'): DayInfo[] {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -47,6 +74,7 @@ export function getDaysForWeek(referenceDate: Date = new Date()): DayInfo[] {
   monday.setDate(current.getDate() - currentDayOfWeek + 1);
 
   const days: DayInfo[] = [];
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.ru;
 
   for (let i = 0; i < 7; i++) {
     const dayDate = new Date(monday.getTime());
@@ -62,8 +90,8 @@ export function getDaysForWeek(referenceDate: Date = new Date()): DayInfo[] {
       date: dayDate,
       isoDate: formatISODate(dayDate),
       dayOfWeek,
-      shortName: DAYS_SHORT_RU[dayOfWeek],
-      fullName: DAYS_FULL_RU[dayOfWeek],
+      shortName: t.daysShort[dayOfWeek],
+      fullName: t.daysFull[dayOfWeek],
       dayOfMonth: dayDate.getDate(),
       monthName: MONTHS_RU[dayDate.getMonth()],
       isToday,

@@ -22,6 +22,63 @@ export function setGasApiUrl(url: string) {
   localStorage.setItem(GAS_URL_KEY, url.trim());
 }
 
+export interface UserDataResponse {
+  ok: boolean;
+  user_id?: number;
+  user_name?: string;
+  lang?: 'ru' | 'uk';
+  is_admin?: boolean;
+  settings?: {
+    sub_exits?: string;
+    reminder_time?: string;
+    sub_gu?: string;
+    sub_schedule?: string;
+  };
+  allowed_weeks?: string[];
+}
+
+/**
+ * Fetch user info, settings, and language preference from GAS bot
+ */
+export async function fetchUserDataFromGAS(
+  userId?: number | string,
+  userName?: string,
+  langCode?: string
+): Promise<UserDataResponse | null> {
+  const gasUrl = getGasApiUrl();
+  if (!gasUrl || !userId) return null;
+
+  try {
+    const targetUrl = new URL(gasUrl);
+    targetUrl.searchParams.set('action', 'get_user_data');
+    targetUrl.searchParams.set('user_id', String(userId));
+    if (userName) targetUrl.searchParams.set('user_name', userName);
+    if (langCode) targetUrl.searchParams.set('lang', langCode);
+    targetUrl.searchParams.set('_t', Date.now().toString());
+
+    const response = await fetch(targetUrl.toString(), {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    if (!response.ok) return null;
+    const data: UserDataResponse = await response.json();
+    if (data && data.ok) {
+      if (data.lang) {
+        try {
+          localStorage.setItem('vchasno_user_lang', data.lang);
+        } catch (_) {}
+      }
+      return data;
+    }
+  } catch (error) {
+    console.warn('Failed to fetch user data from GAS:', error);
+  }
+  return null;
+}
+
 /**
  * Get charges from localStorage cache
  */

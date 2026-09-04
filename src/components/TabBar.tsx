@@ -2,6 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import type { TabType } from '../types';
 import { SFSymbol } from './SFSymbol';
+import { useI18n } from '../context/I18nContext';
 
 interface TabBarProps {
   activeTab: TabType;
@@ -14,15 +15,17 @@ export const TabBar: React.FC<TabBarProps> = ({
   onTabChange,
   onHaptic,
 }) => {
+  const { t } = useI18n();
+
   const tabs: { id: TabType; label: string; icon: string }[] = [
     {
       id: 'home',
-      label: 'Главная',
+      label: t.tabHome,
       icon: '/symbols/SVG_Vector/06_cleaning_sparkles.svg',
     },
     {
       id: 'schedule',
-      label: 'Зарядки',
+      label: t.tabSchedule,
       icon: '/symbols/SVG_Vector/01_charge_bolt.svg',
     },
   ];

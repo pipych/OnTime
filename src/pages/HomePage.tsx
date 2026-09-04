@@ -1,5 +1,6 @@
 import React from 'react';
 import { SFSymbol } from '../components/SFSymbol';
+import { useI18n } from '../context/I18nContext';
 
 interface HomePageProps {
   userName?: string;
@@ -8,20 +9,23 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
-  userName = 'Коллега',
+  userName,
   onNavigateToSchedule,
   chargesCount,
 }) => {
+  const { t } = useI18n();
+  const displayName = userName || t.defaultUserName;
+
   return (
     <div className="w-full max-w-lg mx-auto px-4 pt-4 pb-36 space-y-5 animate-fadeIn">
       {/* Top Welcome Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-[32px] font-bold text-ios-text tracking-tight">
-          Вчасно
+          {t.appTitle}
         </h1>
 
         <div className="w-11 h-11 rounded-full bg-ios-accent/15 border border-ios-accent/30 flex items-center justify-center text-ios-accent font-bold text-[16px] shadow-sm">
-          {userName.charAt(0).toUpperCase()}
+          {displayName.charAt(0).toUpperCase()}
         </div>
       </div>
 
@@ -30,14 +34,13 @@ export const HomePage: React.FC<HomePageProps> = ({
         <div className="p-5 relative z-10 space-y-2">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-ios-green/15 text-ios-green text-[12px] font-semibold">
             <span className="w-2 h-2 rounded-full bg-ios-green animate-pulse" />
-            <span>Система активна</span>
+            <span>{t.systemActive}</span>
           </div>
           <h2 className="text-[20px] font-bold text-ios-text tracking-tight">
-            Привет, {userName}! 👋
+            {t.welcomeGreeting(displayName)}
           </h2>
           <p className="text-[14px] text-ios-textSecondary leading-relaxed">
-            Здесь скоро появятся быстрые действия, статистика смен и отчёты.
-            Сейчас доступен календарный график зарядок устройств.
+            {t.welcomeDesc}
           </p>
         </div>
 
@@ -62,12 +65,12 @@ export const HomePage: React.FC<HomePageProps> = ({
             </div>
             <div>
               <h3 className="text-[17px] font-semibold text-ios-text group-hover:text-ios-accent transition-colors">
-                Зарядки
+                {t.chargesWidgetTitle}
               </h3>
               <p className="text-[13px] text-ios-textSecondary">
                 {chargesCount.total > 0
-                  ? `Сегодня заряжено ${chargesCount.charged} из ${chargesCount.total}`
-                  : 'Проверить устройства'}
+                  ? t.chargesCountToday(chargesCount.charged, chargesCount.total)
+                  : t.checkDevices}
               </p>
             </div>
           </div>
@@ -103,9 +106,9 @@ export const HomePage: React.FC<HomePageProps> = ({
             />
           </div>
           <span className="text-[13px] font-semibold text-ios-text block">
-            Рабочие выходы
+            {t.shiftsTitle}
           </span>
-          <span className="text-[11px] text-ios-textSecondary">В разработке</span>
+          <span className="text-[11px] text-ios-textSecondary">{t.inDevelopment}</span>
         </div>
 
         <div className="p-4 rounded-ios bg-ios-cardSubtle border border-ios-border opacity-70">
@@ -116,9 +119,9 @@ export const HomePage: React.FC<HomePageProps> = ({
             />
           </div>
           <span className="text-[13px] font-semibold text-ios-text block">
-            Ген. уборка
+            {t.cleaningTitle}
           </span>
-          <span className="text-[11px] text-ios-textSecondary">В разработке</span>
+          <span className="text-[11px] text-ios-textSecondary">{t.inDevelopment}</span>
         </div>
       </div>
     </div>
