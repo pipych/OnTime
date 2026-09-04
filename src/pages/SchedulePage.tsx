@@ -34,7 +34,9 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
   );
 
   // Charges map: { "CHG_2026_W36_ITEM_TWS": true, ... }
-  const [charges, setCharges] = useState<Record<string, boolean>>({});
+  const [charges, setCharges] = useState<Record<string, boolean>>(() =>
+    getLocalCharges(getWeekId(new Date()))
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
   const [gasUrlInput, setGasUrlInput] = useState<string>(() => getGasApiUrl());

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import clsx from 'clsx';
 import type { DayInfo, DeviceKey } from '../types';
 import { DEVICES } from '../constants/devices';
 import { SFSymbol } from './SFSymbol';
+import { triggerSideCannonsConfetti } from '../utils/confetti';
 
 interface DeviceChecklistProps {
   day: DayInfo;
@@ -41,6 +42,38 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
   ).length;
   const isAllCharged = totalCount > 0 && chargedCount === totalCount;
   const percent = totalCount > 0 ? Math.round((chargedCount / totalCount) * 100) : 100;
+
+  // 2D side-cannon confetti on reaching 100%
+  const userInteractedRef = useRef<boolean>(false);
+  const prevAllChargedRef = useRef<boolean>(isAllCharged);
+  const currentDayRef = useRef<string>(day.isoDate);
+
+  // Reset interaction and state if day changes
+  if (currentDayRef.current !== day.isoDate) {
+    currentDayRef.current = day.isoDate;
+    prevAllChargedRef.current = isAllCharged;
+    userInteractedRef.current = false;
+  }
+
+  useEffect(() => {
+    if (userInteractedRef.current && !prevAllChargedRef.current && isAllCharged && totalCount > 0) {
+      triggerSideCannonsConfetti();
+      try {
+        window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
+      } catch (_) {}
+    }
+    prevAllChargedRef.current = isAllCharged;
+  }, [isAllCharged, totalCount]);
+
+  const handleDeviceClick = (key: DeviceKey) => {
+    userInteractedRef.current = true;
+    onToggleDevice(key);
+  };
+
+  const handleChargeAllClick = () => {
+    userInteractedRef.current = true;
+    onChargeAll();
+  };
 
   return (
     <div className="w-full space-y-4">
@@ -119,7 +152,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
           return (
             <div
               key={key}
-              onClick={() => onToggleDevice(key)}
+              onClick={() => handleDeviceClick(key)}
               className={clsx(
                 'group p-3.5 rounded-ios bg-ios-card border transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 active:scale-[0.98]',
                 isCharged
@@ -178,7 +211,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onToggleDevice(key);
+                  handleDeviceClick(key);
                 }}
                 className={clsx(
                   'w-9 h-9 rounded-full flex items-center justify-center transition-all duration-250 flex-shrink-0',
@@ -202,7 +235,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
       {totalCount > 0 && !isAllCharged && (
         <div className="pt-3 pb-1 flex justify-center">
           <button
-            onClick={onChargeAll}
+            onClick={handleChargeAllClick}
             className="px-7 py-3 rounded-full bg-ios-accent hover:opacity-90 active:scale-[0.98] text-white font-semibold text-[15px] shadow-glow-accent flex items-center justify-center gap-2.5 transition-all"
           >
             <SFSymbol
@@ -216,7 +249,16 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
 
       {/* When all charged: grey charged battery icon and label */}
       {isAllCharged && totalCount > 0 && (
-        <div className="py-6 flex flex-col items-center justify-center text-center animate-fadeIn">
+        <div
+          onClick={() => {
+            triggerSideCannonsConfetti();
+            try {
+              window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
+            } catch (_) {}
+          }}
+          className="py-6 flex flex-col items-center justify-center text-center animate-fadeIn cursor-pointer active:scale-95 transition-transform select-none"
+          title="Нажмите для праздничного конфетти 🎉"
+        >
           <SFSymbol
             src="/symbols/SVG_Vector/02_charge_battery_bolt.svg"
             className="w-12 h-12 text-ios-textSecondary mb-2"
