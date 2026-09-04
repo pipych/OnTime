@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ios-bg: #F2F2F7;
+  --ios-card: #FFFFFF;
+  --ios-card-subtle: #F7F7FA;
+  --ios-border: rgba(0, 0, 0, 0.06);
+  --ios-text: #000000;
+  --ios-text-secondary: #8E8E93;
+  --ios-accent: #FF9500;
+  --ios-dock-bg: rgba(255, 255, 255, 0.85);
+  --ios-dock-border: rgba(0, 0, 0, 0.08);
+  --ios-item-bg: rgba(0, 0, 0, 0.03);
+  --ios-item-hover: rgba(0, 0, 0, 0.06);
+
+  color-scheme: light;
+}
+
+.dark, :root[data-theme="dark"] {
+  --ios-bg: #0C0D11;
+  --ios-card: #17181F;
+  --ios-card-subtle: #20222B;
+  --ios-border: rgba(255, 255, 255, 0.08);
+  --ios-text: #FFFFFF;
+  --ios-text-secondary: #8E8E93;
+  --ios-accent: #FF9F0A;
+  --ios-dock-bg: rgba(23, 24, 31, 0.88);
+  --ios-dock-border: rgba(255, 255, 255, 0.1);
+  --ios-item-bg: rgba(255, 255, 255, 0.04);
+  --ios-item-hover: rgba(255, 255, 255, 0.08);
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --ios-bg: #0C0D11;
+    --ios-card: #17181F;
+    --ios-card-subtle: #20222B;
+    --ios-border: rgba(255, 255, 255, 0.08);
+    --ios-text: #FFFFFF;
+    --ios-text-secondary: #8E8E93;
+    --ios-accent: #FF9F0A;
+    --ios-dock-bg: rgba(23, 24, 31, 0.88);
+    --ios-dock-border: rgba(255, 255, 255, 0.1);
+    --ios-item-bg: rgba(255, 255, 255, 0.04);
+    --ios-item-hover: rgba(255, 255, 255, 0.08);
+
+    color-scheme: dark;
+  }
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--ios-bg);
+  color: var(--ios-text);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom scrollbar hiding */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* SF Symbol mask helper */
+.sf-icon-mask {
+  display: inline-block;
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-position: center;
+}
+
