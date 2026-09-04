@@ -75,7 +75,7 @@ function AppContent() {
         (rawLower.includes('зверев') || rawLower.includes('звєр') || rawLower.includes('звєреаа') || rawLower.includes('zverev')));
 
     if (isAlina) {
-      return lang === 'uk' ? 'Аліна Звєреаа' : 'Алина Зверева';
+      return lang === 'uk' ? 'Аліна Звєрева' : 'Алина Зверева';
     }
 
     return rawUserName;
