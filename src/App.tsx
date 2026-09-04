@@ -98,16 +98,16 @@ function AppContent() {
 export function App() {
   const { user } = useTelegram();
 
-  // Determine initial language from Telegram language_code or cache
+  // Determine initial language from cache or default to Ukrainian
   const initialLang: Language = useMemo(() => {
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('vchasno_user_lang') as Language | null;
+      const stored = localStorage.getItem('vchasno_user_lang_v2') as Language | null;
       if (stored === 'ru' || stored === 'uk') return stored;
     }
-    if (user?.language_code?.toLowerCase().startsWith('uk')) {
-      return 'uk';
+    if (user?.language_code?.toLowerCase().startsWith('ru')) {
+      return 'ru';
     }
-    return 'ru';
+    return 'uk';
   }, [user?.language_code]);
 
   return (

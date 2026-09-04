@@ -1,4 +1,4 @@
-import { CHARGE_DAYS_MAP, MONTHS_GENITIVE_RU, MONTHS_RU } from '../constants/devices';
+import { CHARGE_DAYS_MAP } from '../constants/devices';
 import { TRANSLATIONS, type Language } from '../constants/i18n';
 import type { DayInfo } from '../types';
 
@@ -59,7 +59,7 @@ export function getWeekRangeStr(dateObj: Date): string {
   return `${f(mon)} — ${f(sun)}`;
 }
 
-export function getDaysForWeek(referenceDate: Date = new Date(), lang: Language = 'ru'): DayInfo[] {
+export function getDaysForWeek(referenceDate: Date = new Date(), lang: Language = 'uk'): DayInfo[] {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -74,7 +74,7 @@ export function getDaysForWeek(referenceDate: Date = new Date(), lang: Language 
   monday.setDate(current.getDate() - currentDayOfWeek + 1);
 
   const days: DayInfo[] = [];
-  const t = TRANSLATIONS[lang] || TRANSLATIONS.ru;
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.uk;
 
   for (let i = 0; i < 7; i++) {
     const dayDate = new Date(monday.getTime());
@@ -93,7 +93,7 @@ export function getDaysForWeek(referenceDate: Date = new Date(), lang: Language 
       shortName: t.daysShort[dayOfWeek],
       fullName: t.daysFull[dayOfWeek],
       dayOfMonth: dayDate.getDate(),
-      monthName: MONTHS_RU[dayDate.getMonth()],
+      monthName: t.monthsGenitive[dayDate.getMonth()],
       isToday,
       isPast,
       isFuture,
@@ -105,8 +105,9 @@ export function getDaysForWeek(referenceDate: Date = new Date(), lang: Language 
   return days;
 }
 
-export function formatFriendlyDate(date: Date): string {
+export function formatFriendlyDate(date: Date, lang: Language = 'uk'): string {
   const day = date.getDate();
-  const month = MONTHS_GENITIVE_RU[date.getMonth()];
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.uk;
+  const month = t.monthsGenitive[date.getMonth()];
   return `${day} ${month}`;
 }

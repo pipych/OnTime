@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { TRANSLATIONS, type Language, type Translations } from '../constants/i18n';
 
 interface I18nContextValue {
@@ -9,19 +9,19 @@ interface I18nContextValue {
 
 const I18nContext = createContext<I18nContextValue | undefined>(undefined);
 
-const LANG_STORAGE_KEY = 'vchasno_user_lang';
+const LANG_STORAGE_KEY = 'vchasno_user_lang_v2';
 
 export const I18nProvider: React.FC<{
   initialLang?: Language;
   children: React.ReactNode;
-}> = ({ initialLang, children }) => {
+}> = ({ initialLang = 'uk', children }) => {
   const [lang, setLangState] = useState<Language>(() => {
     if (initialLang) return initialLang;
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem(LANG_STORAGE_KEY) as Language | null;
       if (stored === 'ru' || stored === 'uk') return stored;
     }
-    return 'ru';
+    return 'uk';
   });
 
   // When initialLang changes (e.g. after fetching user settings from bot)
@@ -43,7 +43,7 @@ export const I18nProvider: React.FC<{
     }
   };
 
-  const t = useMemo(() => TRANSLATIONS[lang] || TRANSLATIONS.ru, [lang]);
+  const t = useMemo(() => TRANSLATIONS[lang] || TRANSLATIONS.uk, [lang]);
 
   const value = useMemo(
     () => ({
