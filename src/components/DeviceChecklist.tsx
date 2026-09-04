@@ -258,11 +258,11 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
           title="Нажмите для праздничного конфетти 🎉"
         >
           <SFSymbol
-            src="/symbols/SVG_Vector/02_charge_battery_bolt.svg"
-            className="w-12 h-12 text-ios-textSecondary mb-2"
+            src="/symbols/SVG_Vector/41_battery_100.svg"
+            className="w-20 h-12 text-ios-textSecondary mb-2.5"
             alt="На сегодня все заряжено!"
           />
-          <span className="text-[15px] font-semibold text-ios-textSecondary">
+          <span className="text-[16px] font-semibold text-ios-textSecondary">
             На сегодня все заряжено!
           </span>
         </div>
