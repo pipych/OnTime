@@ -102,7 +102,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
                 'w-full py-2.5 px-0.5 rounded-[18px] flex flex-col items-center justify-between transition-all duration-200 ease-out relative',
                 isSelected
                   ? 'bg-ios-red text-white shadow-glow-red scale-[1.04] z-10'
-                  : 'bg-ios-card border border-ios-border hover:border-ios-red/40 active:scale-95'
+                  : 'bg-ios-card active:scale-95'
               )}
             >
               {/* Day of Week Name: white if selected, red if unselected */}

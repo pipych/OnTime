@@ -6,13 +6,13 @@
   --ios-bg: #F2F2F7;
   --ios-card: #FFFFFF;
   --ios-card-subtle: #F7F7FA;
-  --ios-border: rgba(0, 0, 0, 0.06);
+  --ios-border: transparent;
   --ios-text: #000000;
   --ios-text-secondary: #8E8E93;
   --ios-accent: #007AFF;
   --ios-accent-glow: rgba(0, 122, 255, 0.4);
   --ios-dock-bg: rgba(255, 255, 255, 0.85);
-  --ios-dock-border: rgba(0, 0, 0, 0.08);
+  --ios-dock-border: transparent;
   --ios-item-bg: rgba(0, 0, 0, 0.03);
   --ios-item-hover: rgba(0, 0, 0, 0.06);
 
@@ -23,13 +23,13 @@
   --ios-bg: #0C0D11;
   --ios-card: #17181F;
   --ios-card-subtle: #20222B;
-  --ios-border: rgba(255, 255, 255, 0.08);
+  --ios-border: transparent;
   --ios-text: #FFFFFF;
   --ios-text-secondary: #8E8E93;
   --ios-accent: #0A84FF;
   --ios-accent-glow: rgba(10, 132, 255, 0.45);
   --ios-dock-bg: rgba(23, 24, 31, 0.88);
-  --ios-dock-border: rgba(255, 255, 255, 0.1);
+  --ios-dock-border: transparent;
   --ios-item-bg: rgba(255, 255, 255, 0.04);
   --ios-item-hover: rgba(255, 255, 255, 0.08);
 
@@ -41,13 +41,13 @@
     --ios-bg: #0C0D11;
     --ios-card: #17181F;
     --ios-card-subtle: #20222B;
-    --ios-border: rgba(255, 255, 255, 0.08);
+    --ios-border: transparent;
     --ios-text: #FFFFFF;
     --ios-text-secondary: #8E8E93;
     --ios-accent: #0A84FF;
     --ios-accent-glow: rgba(10, 132, 255, 0.45);
     --ios-dock-bg: rgba(23, 24, 31, 0.88);
-    --ios-dock-border: rgba(255, 255, 255, 0.1);
+    --ios-dock-border: transparent;
     --ios-item-bg: rgba(255, 255, 255, 0.04);
     --ios-item-hover: rgba(255, 255, 255, 0.08);
 
@@ -58,6 +58,7 @@
 * {
   -webkit-tap-highlight-color: transparent;
   box-sizing: border-box;
+  outline: none;
 }
 
 html, body {

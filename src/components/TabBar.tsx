@@ -39,7 +39,7 @@ export const TabBar: React.FC<TabBarProps> = ({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center px-4 pb-[max(calc(env(safe-area-inset-bottom,0px)+26px),30px)] pointer-events-none">
-      <nav className="pointer-events-auto flex items-center justify-between gap-1.5 p-1.5 rounded-full backdrop-blur-2xl bg-[var(--ios-dock-bg)] border border-[var(--ios-dock-border)] shadow-ios-dock dark:shadow-ios-dock-dark transition-all duration-300">
+      <nav className="pointer-events-auto flex items-center justify-between gap-1.5 p-1.5 rounded-full backdrop-blur-2xl bg-[var(--ios-dock-bg)] shadow-ios-dock dark:shadow-ios-dock-dark transition-all duration-300">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (

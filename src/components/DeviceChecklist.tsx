@@ -82,7 +82,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
 
       {/* Sunday Alert Banner if there are uncharged devices */}
       {isSunday && sundayUnchargedItems.length > 0 && (
-        <div className="p-3.5 rounded-ios-sm bg-ios-red/10 border border-ios-red/20 text-ios-red flex items-start gap-3">
+        <div className="p-3.5 rounded-ios-sm bg-ios-red/10 text-ios-red flex items-start gap-3">
           <SFSymbol
             src="/symbols/SVG_Vector/40_warn_none_charged.svg"
             className="w-6 h-6 flex-shrink-0 mt-0.5 text-ios-red"
@@ -108,12 +108,12 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
               key={key}
               onClick={() => handleDeviceClick(key)}
               className={clsx(
-                'group p-3.5 rounded-ios bg-ios-card border transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 active:scale-[0.98]',
+                'group p-3.5 rounded-ios bg-ios-card transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 active:scale-[0.98]',
                 isCharged
-                  ? 'border-ios-green/30 bg-ios-green/[0.03]'
+                  ? 'bg-ios-green/[0.04]'
                   : isSundayDebt
-                  ? 'border-ios-red/30 bg-ios-red/[0.03]'
-                  : 'border-ios-border hover:border-ios-accent/30'
+                  ? 'bg-ios-red/[0.04]'
+                  : 'hover:bg-ios-cardSubtle'
               )}
             >
               {/* Device Icon + Name */}
@@ -169,7 +169,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
                   'w-9 h-9 rounded-full flex items-center justify-center transition-all duration-250 flex-shrink-0',
                   isCharged
                     ? 'bg-ios-green text-white shadow-glow-green scale-105'
-                    : 'border-2 border-ios-border hover:border-ios-accent text-transparent'
+                    : 'bg-ios-item-bg hover:bg-ios-item-hover text-transparent'
                 )}
                 aria-label={isCharged ? t.chargedStatus : t.pendingStatus}
               >

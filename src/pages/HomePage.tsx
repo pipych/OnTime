@@ -58,13 +58,13 @@ export const HomePage: React.FC<HomePageProps> = ({
           {t.appTitle}
         </h1>
 
-        <div className="w-11 h-11 rounded-full bg-ios-accent/15 border border-ios-accent/30 flex items-center justify-center text-ios-accent font-bold text-[16px] shadow-sm">
+        <div className="w-11 h-11 rounded-full bg-ios-accent/15 flex items-center justify-center text-ios-accent font-bold text-[16px] shadow-sm">
           {displayName.charAt(0).toUpperCase()}
         </div>
       </div>
 
       {/* Hero Welcome Card with unclipped shadow */}
-      <div className="rounded-ios bg-ios-card border border-ios-border shadow-ios-card dark:shadow-ios-card-dark relative">
+      <div className="rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark relative">
         <div className="p-5 relative z-10 space-y-2">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-ios-green/15 text-ios-green text-[12px] font-semibold">
             <span className="w-2 h-2 rounded-full bg-ios-green animate-pulse" />
@@ -87,7 +87,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       {/* Quick Widget: Charges Today */}
       <div
         onClick={onNavigateToSchedule}
-        className="p-5 rounded-ios bg-ios-card border border-ios-border shadow-ios-card dark:shadow-ios-card-dark cursor-pointer active:scale-[0.98] transition-all group"
+        className="p-5 rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark cursor-pointer active:scale-[0.98] transition-all group"
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3.5">
@@ -132,7 +132,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
       {/* Future placeholders in clean iOS style */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="p-4 rounded-ios bg-ios-cardSubtle border border-ios-border opacity-70">
+        <div className="p-4 rounded-ios bg-ios-cardSubtle opacity-70">
           <div className="w-10 h-10 rounded-xl bg-ios-item-bg flex items-center justify-center mb-2.5 text-ios-textSecondary">
             <SFSymbol
               src="/symbols/SVG_Vector/03_shifts_bell.svg"
@@ -145,7 +145,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           <span className="text-[11px] text-ios-textSecondary">{t.inDevelopment}</span>
         </div>
 
-        <div className="p-4 rounded-ios bg-ios-cardSubtle border border-ios-border opacity-70">
+        <div className="p-4 rounded-ios bg-ios-cardSubtle opacity-70">
           <div className="w-10 h-10 rounded-xl bg-ios-item-bg flex items-center justify-center mb-2.5 text-ios-textSecondary">
             <SFSymbol
               src="/symbols/SVG_Vector/05_cleaning_soap_bubbles.svg"

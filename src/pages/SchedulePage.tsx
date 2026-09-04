@@ -276,7 +276,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
             onClick={handlePrevWeek}
             disabled={!canPrev}
             className={clsx(
-              "w-10 h-10 rounded-full flex items-center justify-center bg-ios-card border border-ios-border transition-all shadow-sm",
+              "w-10 h-10 rounded-full flex items-center justify-center bg-ios-card transition-all shadow-sm",
               canPrev
                 ? "text-ios-textSecondary hover:text-ios-text active:scale-90"
                 : "opacity-25 pointer-events-none cursor-not-allowed"
@@ -292,7 +292,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
             onClick={handleNextWeek}
             disabled={!canNext}
             className={clsx(
-              "w-10 h-10 rounded-full flex items-center justify-center bg-ios-card border border-ios-border transition-all shadow-sm",
+              "w-10 h-10 rounded-full flex items-center justify-center bg-ios-card transition-all shadow-sm",
               canNext
                 ? "text-ios-textSecondary hover:text-ios-text active:scale-90"
                 : "opacity-25 pointer-events-none cursor-not-allowed"
