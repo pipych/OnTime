@@ -158,7 +158,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
                 </div>
               </div>
 
-              {/* iOS Checkbox Button */}
+              {/* iOS Checkbox Button: Apple Reminders circle-in-circle style */}
               <button
                 type="button"
                 onClick={(e) => {
@@ -166,13 +166,20 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
                   handleDeviceClick(key);
                 }}
                 className={clsx(
-                  'w-6 h-6 rounded-full transition-all duration-200 flex-shrink-0',
+                  'w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0 border-2',
                   isCharged
-                    ? 'bg-ios-green shadow-glow-green scale-105'
-                    : 'border-2 border-black/20 dark:border-white/25 hover:border-ios-green/50 bg-transparent'
+                    ? 'border-ios-green shadow-glow-green scale-105'
+                    : 'border-black/20 dark:border-white/25 hover:border-ios-green/50 bg-transparent'
                 )}
                 aria-label={isCharged ? t.chargedStatus : t.pendingStatus}
-              />
+              >
+                <span
+                  className={clsx(
+                    'w-3.5 h-3.5 rounded-full bg-ios-green transition-all duration-200 ease-out',
+                    isCharged ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
+                  )}
+                />
+              </button>
             </div>
           );
         })}
