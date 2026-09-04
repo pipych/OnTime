@@ -14,10 +14,11 @@ import { SFSymbol } from '../components/SFSymbol';
 import { CHARGE_DAYS_MAP } from '../constants/devices';
 import { useI18n } from '../context/I18nContext';
 import {
-  fetchChargesFromGAS,
+  fetchWeeklyDataFromGAS,
   toggleChargeGAS,
   chargeAllGAS,
   getLocalCharges,
+  getLocalSchedule,
   getGasApiUrl,
 } from '../services/api';
 
@@ -51,6 +52,21 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
       const wId = getWeekId(d);
       const cached = getLocalCharges(wId);
       Object.assign(initial, cached);
+    }
+    return initial;
+  });
+
+  // Schedules map: accumulates schedules for loaded weeks
+  const [schedules, setSchedules] = useState<Record<string, Record<string, string>>>(() => {
+    const initial: Record<string, Record<string, string>> = {};
+    const now = new Date();
+    for (let offset = -2; offset <= 1; offset++) {
+      const d = new Date(now.getTime() + offset * 7 * 86400000);
+      const wId = getWeekId(d);
+      const cached = getLocalSchedule(wId);
+      if (cached) {
+        initial[wId] = cached;
+      }
     }
     return initial;
   });
@@ -117,7 +133,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
   const activeWeekRef = useRef<string>(currentWeekId);
   activeWeekRef.current = currentWeekId;
 
-  // Load charges from cache & GAS
+  // Load charges & schedule from cache & GAS
   const loadCharges = useCallback(async () => {
     const targetWeek = currentWeekId;
 
@@ -126,26 +142,35 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     if (Object.keys(local).length > 0) {
       setCharges((prev) => ({ ...prev, ...local }));
     }
+    const cachedSched = getLocalSchedule(targetWeek);
+    if (cachedSched) {
+      setSchedules((prev) => ({ ...prev, [targetWeek]: cachedSched }));
+    }
 
     // 2. Fetch from GAS
     const gasUrl = getGasApiUrl();
     if (gasUrl) {
       try {
-        const gasCharges = await fetchChargesFromGAS(targetWeek);
+        const result = await fetchWeeklyDataFromGAS(targetWeek);
         if (activeWeekRef.current === targetWeek) {
-          setCharges((prev) => {
-            const updated = { ...prev };
-            // Clean uncharged keys for targetWeek that are no longer true
-            for (const k in updated) {
-              if (k.startsWith(`CHG_${targetWeek}_`) && !gasCharges[k]) {
-                delete updated[k];
+          if (result.charges) {
+            setCharges((prev) => {
+              const updated = { ...prev };
+              // Clean uncharged keys for targetWeek that are no longer true
+              for (const k in updated) {
+                if (k.startsWith(`CHG_${targetWeek}_`) && !result.charges[k]) {
+                  delete updated[k];
+                }
               }
-            }
-            return { ...updated, ...gasCharges };
-          });
+              return { ...updated, ...result.charges };
+            });
+          }
+          if (result.schedule) {
+            setSchedules((prev) => ({ ...prev, [targetWeek]: result.schedule! }));
+          }
         }
       } catch (e) {
-        // Cached local charges remain active
+        // Cached local charges and schedule remain active
       }
     }
   }, [currentWeekId]);
@@ -176,9 +201,12 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
       const wId = getWeekId(d);
       if (wId !== currentWeekId) {
         try {
-          const remote = await fetchChargesFromGAS(wId);
-          if (remote && Object.keys(remote).length > 0) {
-            setCharges((prev) => ({ ...prev, ...remote }));
+          const remote = await fetchWeeklyDataFromGAS(wId);
+          if (remote.charges && Object.keys(remote.charges).length > 0) {
+            setCharges((prev) => ({ ...prev, ...remote.charges }));
+          }
+          if (remote.schedule) {
+            setSchedules((prev) => ({ ...prev, [wId]: remote.schedule! }));
           }
         } catch (_) {}
       }
@@ -339,6 +367,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
       <DeviceChecklist
         day={selectedDay}
         charges={charges}
+        schedule={schedules[currentWeekId]}
         onToggleDevice={handleToggleDevice}
         onChargeAll={handleChargeAll}
         sundayUnchargedItems={sundayUnchargedItems}

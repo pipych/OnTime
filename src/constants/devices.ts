@@ -143,6 +143,22 @@ export const CHARGE_DAYS_MAP: Record<number, DeviceKey[]> = {
   0: ['ITEM_GREEN_WATCH'],                         // Вс
 };
 
+export const DEVICE_DAY_MAP: Record<DeviceKey, number> = {
+  ITEM_TWS: 1,
+  ITEM_OVEREAR: 1,
+  ITEM_HEADSET: 1,
+  ITEM_PHONES: 2,
+  ITEM_FLASHLIGHTS: 2,
+  ITEM_POWERBANKS: 3,
+  ITEM_WATCHES: 4,
+  ITEM_SPEAKERS: 5,
+  ITEM_LIGHTERS: 6,
+  ITEM_CAMERAS: 6,
+  ITEM_CONSOLES: 6,
+  ITEM_MISC: 6,
+  ITEM_GREEN_WATCH: 0,
+};
+
 export const DAYS_SHORT_RU = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
 export const DAYS_FULL_RU = [
   'Воскресенье',

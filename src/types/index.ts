@@ -45,4 +45,6 @@ export interface WeekChargesResponse {
   ok: boolean;
   week: string;
   charges: Record<string, string>;
+  schedule?: Record<string, string> | null;
+  allowed_weeks?: string[];
 }

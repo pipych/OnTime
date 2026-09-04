@@ -35,6 +35,7 @@ export interface UserDataResponse {
     sub_schedule?: string;
   };
   allowed_weeks?: string[];
+  schedule?: Record<string, string> | null;
 }
 
 /**
@@ -71,12 +72,40 @@ export async function fetchUserDataFromGAS(
           localStorage.setItem('vchasno_user_lang', data.lang);
         } catch (_) {}
       }
+      if (data.schedule) {
+        saveLocalSchedule(getWeekId(), data.schedule);
+      }
       return data;
     }
   } catch (error) {
     console.warn('Failed to fetch user data from GAS:', error);
   }
   return null;
+}
+
+const LOCAL_STORAGE_SCHED_PREFIX = 'vchasno_sched_';
+
+/**
+ * Get schedule from localStorage cache
+ */
+export function getLocalSchedule(weekId: string): Record<string, string> | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_SCHED_PREFIX + weekId);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
+ * Save schedule to localStorage cache
+ */
+export function saveLocalSchedule(weekId: string, sched: Record<string, string> | null) {
+  if (typeof window === 'undefined' || !sched) return;
+  try {
+    localStorage.setItem(LOCAL_STORAGE_SCHED_PREFIX + weekId, JSON.stringify(sched));
+  } catch (e) {}
 }
 
 /**
@@ -86,8 +115,7 @@ export function getLocalCharges(weekId: string): Record<string, boolean> {
   if (typeof window === 'undefined') return {};
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY_PREFIX + weekId);
-    if (!raw) return {};
-    return JSON.parse(raw);
+    return raw ? JSON.parse(raw) : {};
   } catch (e) {
     return {};
   }
@@ -104,14 +132,18 @@ export function saveLocalCharges(weekId: string, charges: Record<string, boolean
 }
 
 /**
- * Fetch charges from Google Apps Script Web App
+ * Fetch both charges and weekly schedule from Google Apps Script Web App
  */
-export async function fetchChargesFromGAS(weekId: string = getWeekId()): Promise<Record<string, boolean>> {
+export async function fetchWeeklyDataFromGAS(weekId: string = getWeekId()): Promise<{
+  charges: Record<string, boolean>;
+  schedule: Record<string, string> | null;
+}> {
   const gasUrl = getGasApiUrl();
-  const cached = getLocalCharges(weekId);
+  const cachedCharges = getLocalCharges(weekId);
+  const cachedSchedule = getLocalSchedule(weekId);
 
   if (!gasUrl) {
-    return cached;
+    return { charges: cachedCharges, schedule: cachedSchedule };
   }
 
   try {
@@ -129,26 +161,41 @@ export async function fetchChargesFromGAS(weekId: string = getWeekId()): Promise
 
     if (!response.ok) {
       console.warn(`GAS HTTP status: ${response.status}`);
-      return cached;
+      return { charges: cachedCharges, schedule: cachedSchedule };
     }
 
     const data: WeekChargesResponse = await response.json();
+    let parsedCharges: Record<string, boolean> = cachedCharges;
     if (data && data.ok && data.charges) {
-      const parsedCharges: Record<string, boolean> = {};
-      // Single source of truth from GAS
+      parsedCharges = {};
       for (const [key, value] of Object.entries(data.charges)) {
         if (value === 'true' || value === (true as any)) {
           parsedCharges[key] = true;
         }
       }
       saveLocalCharges(weekId, parsedCharges);
-      return parsedCharges;
     }
+
+    let parsedSchedule: Record<string, string> | null = cachedSchedule;
+    if (data && data.ok && data.schedule) {
+      parsedSchedule = data.schedule;
+      saveLocalSchedule(weekId, data.schedule);
+    }
+
+    return { charges: parsedCharges, schedule: parsedSchedule };
   } catch (error) {
-    console.warn('Failed to fetch charges from Google Apps Script, using local cache:', error);
+    console.warn('Failed to fetch weekly data from Google Apps Script, using local cache:', error);
   }
 
-  return cached;
+  return { charges: cachedCharges, schedule: cachedSchedule };
+}
+
+/**
+ * Fetch charges from Google Apps Script Web App
+ */
+export async function fetchChargesFromGAS(weekId: string = getWeekId()): Promise<Record<string, boolean>> {
+  const result = await fetchWeeklyDataFromGAS(weekId);
+  return result.charges;
 }
 
 /**

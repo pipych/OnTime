@@ -1,14 +1,16 @@
 import React, { useRef, useEffect } from 'react';
 import clsx from 'clsx';
 import type { DayInfo, DeviceKey } from '../types';
-import { DEVICES } from '../constants/devices';
+import { DEVICES, DEVICE_DAY_MAP } from '../constants/devices';
 import { SFSymbol } from './SFSymbol';
 import { triggerSideCannonsConfetti } from '../utils/confetti';
 import { useI18n } from '../context/I18nContext';
+import { formatResponsibleName, getResponsibleForDay } from '../utils/name';
 
 interface DeviceChecklistProps {
   day: DayInfo;
   charges: Record<string, boolean>;
+  schedule?: Record<string, string> | null;
   onToggleDevice: (deviceKey: DeviceKey) => void;
   onChargeAll: () => void;
   sundayUnchargedItems?: DeviceKey[];
@@ -17,6 +19,7 @@ interface DeviceChecklistProps {
 export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
   day,
   charges,
+  schedule,
   onToggleDevice,
   onChargeAll,
   sundayUnchargedItems = [],
@@ -102,6 +105,11 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
 
           const isCharged = !!charges[`CHG_${day.weekId}_${key}`];
           const deviceName = lang === 'uk' ? device.nameUk : device.nameRu;
+          const targetDayOfWeek = isSundayDebt
+            ? (DEVICE_DAY_MAP[key] ?? day.dayOfWeek)
+            : day.dayOfWeek;
+          const rawPerson = getResponsibleForDay(schedule, targetDayOfWeek);
+          const responsiblePerson = formatResponsibleName(rawPerson, lang);
 
           return (
             <div
@@ -153,6 +161,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
                   <div className="text-[12px]">
                     <span className={isCharged ? 'text-ios-green font-medium' : 'text-ios-textSecondary'}>
                       {isCharged ? t.chargedStatus : t.pendingStatus}
+                      {responsiblePerson ? ` • ${responsiblePerson}` : ''}
                     </span>
                   </div>
                 </div>

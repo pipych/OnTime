@@ -1,44 +1,12 @@
 import React from 'react';
 import { SFSymbol } from '../components/SFSymbol';
 import { useI18n } from '../context/I18nContext';
+import { getFirstName } from '../utils/name';
 
 interface HomePageProps {
   userName?: string;
   onNavigateToSchedule: () => void;
   chargesCount: { charged: number; total: number };
-}
-
-/**
- * Extracts strictly the first name for friendly greeting without surnames
- */
-export function getFirstName(fullName?: string, lang?: 'ru' | 'uk'): string {
-  if (!fullName) return '';
-  // Remove any telegram handles or bracketed text like (@username)
-  const clean = fullName.replace(/\s*\(.*?\)\s*/g, '').trim();
-  if (!clean) return '';
-
-  const lower = clean.toLowerCase();
-  if (lower.includes('алін') || lower.includes('алин')) {
-    return lang === 'uk' ? 'Аліна' : 'Алина';
-  }
-  if (lower.includes('артем') || lower.includes('артём')) {
-    return 'Артем';
-  }
-  if (lower.includes('богдан')) {
-    return 'Богдан';
-  }
-
-  const parts = clean.split(/\s+/);
-  if (parts.length <= 1) return clean;
-
-  // Check if first word is a surname (ends with -ов, -ова, -ев, -єв, -ева, -єва, -ин, -ина, -ін, -іна, -ский, -ская, -ський, -ська)
-  const surnameRegex = /(ов|ова|ев|єв|ева|єва|ин|ина|ін|іна|ский|ская|ський|ська)$/i;
-  if (surnameRegex.test(parts[0]) && !surnameRegex.test(parts[1])) {
-    return parts[1];
-  }
-
-  // Otherwise default to first word (standard "Name Surname")
-  return parts[0];
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
