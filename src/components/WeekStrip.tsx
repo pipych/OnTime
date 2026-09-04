@@ -12,6 +12,7 @@ interface WeekStripProps {
   onNextWeek?: () => void;
   onToday?: () => void;
   weekRangeStr: string;
+  slideDirection?: 'left' | 'right' | null;
 }
 
 export const WeekStrip: React.FC<WeekStripProps> = ({
@@ -23,6 +24,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
   onNextWeek,
   onToday,
   weekRangeStr,
+  slideDirection = null,
 }) => {
   const [touchStartX, setTouchStartX] = React.useState<number | null>(null);
   const [touchStartY, setTouchStartY] = React.useState<number | null>(null);
@@ -74,7 +76,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
 
   return (
     <div
-      className="w-full mb-5 select-none touch-pan-y"
+      className="w-full mb-5 select-none touch-pan-y overflow-visible"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -104,7 +106,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
             >
               <SFSymbol
                 src="/symbols/SVG_Vector/15_back_chevron.svg"
-                className="w-4.5 h-4.5"
+                className="w-5 h-5"
               />
             </button>
             <button
@@ -114,15 +116,22 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
             >
               <SFSymbol
                 src="/symbols/SVG_Vector/15_back_chevron.svg"
-                className="w-4.5 h-4.5 rotate-180"
+                className="w-5 h-5 rotate-180"
               />
             </button>
           </div>
         )}
       </div>
 
-      {/* Days Horizontal Strip with ample padding so shadows/glow don't clip */}
-      <div className="flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar py-3 px-1 -my-1">
+      {/* Days Strip with animated slide and unclipped overflow */}
+      <div
+        key={days[0]?.isoDate}
+        className={clsx(
+          'grid grid-cols-7 gap-1.5 py-3 px-0.5 overflow-visible transition-all duration-300',
+          slideDirection === 'right' && 'animate-slide-right',
+          slideDirection === 'left' && 'animate-slide-left'
+        )}
+      >
         {days.map((day) => {
           const isSelected = day.isoDate === selectedDate;
           const status = getDayStatus(day);
@@ -132,7 +141,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
               key={day.isoDate}
               onClick={() => onSelectDay(day)}
               className={clsx(
-                'flex-1 min-w-[42px] max-w-[56px] py-2.5 px-1 rounded-[18px] flex flex-col items-center justify-between transition-all duration-200 ease-out relative',
+                'w-full py-2.5 px-0.5 rounded-[18px] flex flex-col items-center justify-between transition-all duration-200 ease-out relative',
                 isSelected
                   ? 'bg-ios-accent text-white shadow-glow-accent scale-[1.04] z-10'
                   : 'bg-ios-card border border-ios-border text-ios-text hover:border-ios-accent/40 active:scale-95'

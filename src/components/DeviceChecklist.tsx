@@ -131,20 +131,18 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
             >
               {/* Device Icon + Name */}
               <div className="flex items-center gap-3.5 min-w-0">
-                <div
-                  className={clsx(
-                    'w-13 h-13 rounded-2xl flex items-center justify-center flex-shrink-0 transition-colors',
-                    isCharged
-                      ? 'bg-ios-green/15 text-ios-green'
-                      : isSundayDebt
-                      ? 'bg-ios-red/15 text-ios-red'
-                      : 'bg-ios-cardSubtle text-ios-text'
-                  )}
-                >
+                <div className="w-12 h-12 flex items-center justify-center flex-shrink-0">
                   <SFSymbol
                     src={device.symbolSvg}
                     fallbackPng={device.symbolPngWhite}
-                    className="w-8 h-8"
+                    className={clsx(
+                      'w-10 h-10 transition-colors',
+                      isCharged
+                        ? 'text-ios-green'
+                        : isSundayDebt
+                        ? 'text-ios-red'
+                        : 'text-ios-text'
+                    )}
                     alt={device.nameRu}
                   />
                 </div>
@@ -200,30 +198,33 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
         })}
       </div>
 
-      {/* Action buttons with padding for unclipped glow */}
+      {/* Action button: compact centered pill */}
       {totalCount > 0 && !isAllCharged && (
-        <div className="pt-2.5 pb-1">
+        <div className="pt-3 pb-1 flex justify-center">
           <button
             onClick={onChargeAll}
-            className="w-full py-3.5 px-4 rounded-ios bg-ios-accent hover:opacity-90 active:scale-[0.98] text-white font-semibold text-[15px] shadow-glow-accent flex items-center justify-center gap-2.5 transition-all"
+            className="px-7 py-3 rounded-full bg-ios-accent hover:opacity-90 active:scale-[0.98] text-white font-semibold text-[15px] shadow-glow-accent flex items-center justify-center gap-2.5 transition-all"
           >
             <SFSymbol
               src="/symbols/SVG_Vector/37_status_all_charged.svg"
-              className="w-7 h-7 text-white"
+              className="w-5 h-5 text-white"
             />
-            <span>Зарядить всё на сегодня</span>
+            <span>Всё заряжено</span>
           </button>
         </div>
       )}
 
-      {/* Celebratory badge if all charged */}
+      {/* When all charged: grey charged battery icon and label */}
       {isAllCharged && totalCount > 0 && (
-        <div className="p-4 rounded-ios bg-ios-green/10 border border-ios-green/20 text-center text-ios-green font-medium text-[14px] flex items-center justify-center gap-2.5 animate-fadeIn">
+        <div className="py-6 flex flex-col items-center justify-center text-center animate-fadeIn">
           <SFSymbol
-            src="/symbols/SVG_Vector/37_status_all_charged.svg"
-            className="w-7 h-7 text-ios-green"
+            src="/symbols/SVG_Vector/02_charge_battery_bolt.svg"
+            className="w-12 h-12 text-ios-textSecondary mb-2"
+            alt="На сегодня все заряжено!"
           />
-          <span>Отлично! Все устройства на этот день заряжены 👍</span>
+          <span className="text-[15px] font-semibold text-ios-textSecondary">
+            На сегодня все заряжено!
+          </span>
         </div>
       )}
     </div>

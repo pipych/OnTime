@@ -139,6 +139,9 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     chargeAllGAS(currentWeekId, items);
   };
 
+  // Week slide animation direction
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right' | null>(null);
+
   // Navigation handlers
   const handleSelectDay = (day: DayInfo) => {
     onHapticSelection?.();
@@ -147,6 +150,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
 
   const handlePrevWeek = () => {
     onHapticImpact?.('light');
+    setSlideDirection('left');
     const d = new Date(referenceDate.getTime());
     d.setDate(d.getDate() - 7);
     setReferenceDate(d);
@@ -155,6 +159,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
 
   const handleNextWeek = () => {
     onHapticImpact?.('light');
+    setSlideDirection('right');
     const d = new Date(referenceDate.getTime());
     d.setDate(d.getDate() + 7);
     setReferenceDate(d);
@@ -163,6 +168,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
 
   const handleToday = () => {
     onHapticImpact?.('medium');
+    setSlideDirection(null);
     const now = new Date();
     setReferenceDate(now);
     setSelectedIsoDate(formatISODate(now));
@@ -228,6 +234,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
         onNextWeek={handleNextWeek}
         onToday={handleToday}
         weekRangeStr={weekRangeStr}
+        slideDirection={slideDirection}
       />
 
       {/* Device Checklist for Selected Day */}
@@ -253,7 +260,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
               >
                 <SFSymbol
                   src="/symbols/SVG_Vector/12_close_xmark.svg"
-                  className="w-4.5 h-4.5"
+                  className="w-5 h-5"
                 />
               </button>
             </div>
