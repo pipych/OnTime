@@ -63,25 +63,25 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
 
         {/* Prev / Next week arrows */}
         {(onPrevWeek || onNextWeek) && (
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={onPrevWeek}
-              className="w-7 h-7 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-transform"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-all"
               aria-label="Предыдущая неделя"
             >
               <SFSymbol
                 src="/symbols/SVG_Vector/15_back_chevron.svg"
-                className="w-3.5 h-3.5"
+                className="w-4 h-4"
               />
             </button>
             <button
               onClick={onNextWeek}
-              className="w-7 h-7 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-transform"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-all"
               aria-label="Следующая неделя"
             >
               <SFSymbol
                 src="/symbols/SVG_Vector/15_back_chevron.svg"
-                className="w-3.5 h-3.5 rotate-180"
+                className="w-4 h-4 rotate-180"
               />
             </button>
           </div>
@@ -101,7 +101,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
               className={clsx(
                 'flex-1 min-w-[42px] max-w-[56px] py-2.5 px-1 rounded-[18px] flex flex-col items-center justify-between transition-all duration-200 ease-out relative',
                 isSelected
-                  ? 'bg-ios-accent text-white shadow-glow-orange scale-[1.04] z-10'
+                  ? 'bg-ios-accent text-white shadow-glow-accent scale-[1.04] z-10'
                   : 'bg-ios-card border border-ios-border text-ios-text hover:border-ios-accent/40 active:scale-95'
               )}
             >

@@ -175,7 +175,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto px-4 pt-3 pb-28 space-y-4 animate-fadeIn">
+    <div className="w-full max-w-lg mx-auto px-4 pt-3 pb-36 space-y-4 animate-fadeIn">
       {/* Top Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -197,28 +197,28 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
         </div>
 
         {/* Sync / Settings button */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <button
             onClick={loadCharges}
             disabled={isLoading}
-            className="w-9 h-9 rounded-full flex items-center justify-center bg-ios-card border border-ios-border text-ios-textSecondary hover:text-ios-text active:scale-95 transition-all"
+            className="w-10 h-10 rounded-full flex items-center justify-center bg-ios-card border border-ios-border text-ios-textSecondary hover:text-ios-text active:scale-95 transition-all shadow-sm"
             title="Обновить данные"
             aria-label="Обновить данные"
           >
             <SFSymbol
               src="/symbols/SVG_Vector/08_schedule_calendar_clock.svg"
-              className={`w-4 h-4 ${isLoading ? 'animate-spin text-ios-accent' : ''}`}
+              className={`w-5 h-5 ${isLoading ? 'animate-spin text-ios-accent' : ''}`}
             />
           </button>
           <button
             onClick={() => setShowSettingsModal(true)}
-            className="w-9 h-9 rounded-full flex items-center justify-center bg-ios-card border border-ios-border text-ios-textSecondary hover:text-ios-text active:scale-95 transition-all"
+            className="w-10 h-10 rounded-full flex items-center justify-center bg-ios-card border border-ios-border text-ios-textSecondary hover:text-ios-text active:scale-95 transition-all shadow-sm"
             title="Настройки подключения"
             aria-label="Настройки подключения"
           >
             <SFSymbol
               src="/symbols/SVG_Vector/11_settings_gear.svg"
-              className="w-4 h-4"
+              className="w-5 h-5"
             />
           </button>
         </div>
@@ -255,11 +255,11 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
               </h3>
               <button
                 onClick={() => setShowSettingsModal(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center bg-ios-item-bg text-ios-textSecondary hover:text-ios-text"
+                className="w-9 h-9 rounded-full flex items-center justify-center bg-ios-item-bg text-ios-textSecondary hover:text-ios-text active:scale-95 transition-all"
               >
                 <SFSymbol
                   src="/symbols/SVG_Vector/12_close_xmark.svg"
-                  className="w-3.5 h-3.5"
+                  className="w-4.5 h-4.5"
                 />
               </button>
             </div>
@@ -291,7 +291,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
               </button>
               <button
                 onClick={handleSaveGasUrl}
-                className="px-5 py-2.5 rounded-full bg-ios-accent text-white font-semibold text-[14px] shadow-glow-orange active:scale-95 transition-all"
+                className="px-5 py-2.5 rounded-full bg-ios-accent text-white font-semibold text-[14px] shadow-glow-accent active:scale-95 transition-all"
               >
                 Сохранить
               </button>

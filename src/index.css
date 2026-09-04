@@ -9,7 +9,8 @@
   --ios-border: rgba(0, 0, 0, 0.06);
   --ios-text: #000000;
   --ios-text-secondary: #8E8E93;
-  --ios-accent: #FF9500;
+  --ios-accent: #007AFF;
+  --ios-accent-glow: rgba(0, 122, 255, 0.4);
   --ios-dock-bg: rgba(255, 255, 255, 0.85);
   --ios-dock-border: rgba(0, 0, 0, 0.08);
   --ios-item-bg: rgba(0, 0, 0, 0.03);
@@ -25,7 +26,8 @@
   --ios-border: rgba(255, 255, 255, 0.08);
   --ios-text: #FFFFFF;
   --ios-text-secondary: #8E8E93;
-  --ios-accent: #FF9F0A;
+  --ios-accent: #0A84FF;
+  --ios-accent-glow: rgba(10, 132, 255, 0.45);
   --ios-dock-bg: rgba(23, 24, 31, 0.88);
   --ios-dock-border: rgba(255, 255, 255, 0.1);
   --ios-item-bg: rgba(255, 255, 255, 0.04);
@@ -42,7 +44,8 @@
     --ios-border: rgba(255, 255, 255, 0.08);
     --ios-text: #FFFFFF;
     --ios-text-secondary: #8E8E93;
-    --ios-accent: #FF9F0A;
+    --ios-accent: #0A84FF;
+    --ios-accent-glow: rgba(10, 132, 255, 0.45);
     --ios-dock-bg: rgba(23, 24, 31, 0.88);
     --ios-dock-border: rgba(255, 255, 255, 0.1);
     --ios-item-bg: rgba(255, 255, 255, 0.04);

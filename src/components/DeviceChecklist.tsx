@@ -71,7 +71,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
                 isAllCharged
                   ? 'border-ios-green bg-ios-green/10 text-ios-green'
                   : chargedCount > 0
-                  ? 'border-ios-orange bg-ios-orange/10 text-ios-orange'
+                  ? 'border-ios-accent bg-ios-accent/10 text-ios-accent'
                   : 'border-ios-border bg-ios-cardSubtle text-ios-textSecondary'
               )}
             >
@@ -86,7 +86,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
             <div
               className={clsx(
                 'h-full rounded-full transition-all duration-300 ease-out',
-                isAllCharged ? 'bg-ios-green' : 'bg-ios-orange'
+                isAllCharged ? 'bg-ios-green' : 'bg-ios-accent'
               )}
               style={{ width: `${percent}%` }}
             />
@@ -99,7 +99,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
         <div className="p-3.5 rounded-ios-sm bg-ios-red/10 border border-ios-red/20 text-ios-red flex items-start gap-3">
           <SFSymbol
             src="/symbols/SVG_Vector/40_warn_none_charged.svg"
-            className="w-5 h-5 flex-shrink-0 mt-0.5 text-ios-red"
+            className="w-6 h-6 flex-shrink-0 mt-0.5 text-ios-red"
           />
           <div className="text-[13px] leading-snug">
             <span className="font-semibold block mb-0.5">Воскресный аудит зарядок!</span>
@@ -133,7 +133,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
               <div className="flex items-center gap-3 min-w-0">
                 <div
                   className={clsx(
-                    'w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 transition-colors',
+                    'w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-colors',
                     isCharged
                       ? 'bg-ios-green/15 text-ios-green'
                       : isSundayDebt
@@ -144,7 +144,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
                   <SFSymbol
                     src={device.symbolSvg}
                     fallbackPng={device.symbolPngWhite}
-                    className="w-6 h-6"
+                    className="w-7 h-7"
                     alt={device.nameRu}
                   />
                 </div>
@@ -183,7 +183,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
                   onToggleDevice(key);
                 }}
                 className={clsx(
-                  'w-7 h-7 rounded-full flex items-center justify-center transition-all duration-250 flex-shrink-0',
+                  'w-8 h-8 rounded-full flex items-center justify-center transition-all duration-250 flex-shrink-0',
                   isCharged
                     ? 'bg-ios-green text-white shadow-glow-green scale-105'
                     : 'border-2 border-ios-border hover:border-ios-accent text-transparent'
@@ -192,7 +192,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
               >
                 <SFSymbol
                   src="/symbols/SVG_Vector/38_status_on.svg"
-                  className={clsx('w-3.5 h-3.5 text-white', !isCharged && 'opacity-0')}
+                  className={clsx('w-4.5 h-4.5 text-white', !isCharged && 'opacity-0')}
                 />
               </button>
             </div>
@@ -205,11 +205,11 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
         <div className="pt-2">
           <button
             onClick={onChargeAll}
-            className="w-full py-3.5 px-4 rounded-ios bg-ios-accent hover:opacity-90 active:scale-[0.98] text-white font-semibold text-[15px] shadow-glow-orange flex items-center justify-center gap-2 transition-all"
+            className="w-full py-3.5 px-4 rounded-ios bg-ios-accent hover:opacity-90 active:scale-[0.98] text-white font-semibold text-[15px] shadow-glow-accent flex items-center justify-center gap-2.5 transition-all"
           >
             <SFSymbol
               src="/symbols/SVG_Vector/37_status_all_charged.svg"
-              className="w-5 h-5 text-white"
+              className="w-6 h-6 text-white"
             />
             <span>Зарядить всё на сегодня</span>
           </button>
@@ -218,10 +218,10 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
 
       {/* Celebratory badge if all charged */}
       {isAllCharged && totalCount > 0 && (
-        <div className="p-4 rounded-ios bg-ios-green/10 border border-ios-green/20 text-center text-ios-green font-medium text-[14px] flex items-center justify-center gap-2 animate-fadeIn">
+        <div className="p-4 rounded-ios bg-ios-green/10 border border-ios-green/20 text-center text-ios-green font-medium text-[14px] flex items-center justify-center gap-2.5 animate-fadeIn">
           <SFSymbol
             src="/symbols/SVG_Vector/37_status_all_charged.svg"
-            className="w-5 h-5 text-ios-green"
+            className="w-6 h-6 text-ios-green"
           />
           <span>Отлично! Все устройства на этот день заряжены 👍</span>
         </div>

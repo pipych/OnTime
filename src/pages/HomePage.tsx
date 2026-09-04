@@ -13,7 +13,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   chargesCount,
 }) => {
   return (
-    <div className="w-full max-w-lg mx-auto px-4 pt-4 pb-28 space-y-5 animate-fadeIn">
+    <div className="w-full max-w-lg mx-auto px-4 pt-4 pb-36 space-y-5 animate-fadeIn">
       {/* Top Welcome Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -56,11 +56,11 @@ export const HomePage: React.FC<HomePageProps> = ({
         className="p-5 rounded-ios bg-ios-card border border-ios-border shadow-ios-card dark:shadow-ios-card-dark cursor-pointer active:scale-[0.98] transition-all group"
       >
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-ios-orange/15 text-ios-orange flex items-center justify-center">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-ios-accent/15 text-ios-accent flex items-center justify-center flex-shrink-0">
               <SFSymbol
                 src="/symbols/SVG_Vector/01_charge_bolt.svg"
-                className="w-5 h-5 text-ios-orange"
+                className="w-6 h-6 text-ios-accent"
               />
             </div>
             <div>
@@ -77,7 +77,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
           <SFSymbol
             src="/symbols/SVG_Vector/15_back_chevron.svg"
-            className="w-4 h-4 text-ios-textSecondary rotate-180 group-hover:translate-x-0.5 transition-transform"
+            className="w-5 h-5 text-ios-textSecondary rotate-180 group-hover:translate-x-0.5 transition-transform"
           />
         </div>
 
@@ -85,7 +85,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         {chargesCount.total > 0 && (
           <div className="w-full h-1.5 rounded-full bg-ios-item-bg overflow-hidden">
             <div
-              className="h-full rounded-full bg-ios-orange transition-all duration-300"
+              className="h-full rounded-full bg-ios-accent transition-all duration-300"
               style={{
                 width: `${Math.round(
                   (chargesCount.charged / chargesCount.total) * 100
@@ -99,10 +99,10 @@ export const HomePage: React.FC<HomePageProps> = ({
       {/* Future placeholders in clean iOS style */}
       <div className="grid grid-cols-2 gap-3">
         <div className="p-4 rounded-ios bg-ios-cardSubtle border border-ios-border opacity-70">
-          <div className="w-8 h-8 rounded-lg bg-ios-item-bg flex items-center justify-center mb-2 text-ios-textSecondary">
+          <div className="w-10 h-10 rounded-xl bg-ios-item-bg flex items-center justify-center mb-2.5 text-ios-textSecondary">
             <SFSymbol
               src="/symbols/SVG_Vector/03_shifts_bell.svg"
-              className="w-4 h-4"
+              className="w-5 h-5"
             />
           </div>
           <span className="text-[13px] font-semibold text-ios-text block">
@@ -112,10 +112,10 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
 
         <div className="p-4 rounded-ios bg-ios-cardSubtle border border-ios-border opacity-70">
-          <div className="w-8 h-8 rounded-lg bg-ios-item-bg flex items-center justify-center mb-2 text-ios-textSecondary">
+          <div className="w-10 h-10 rounded-xl bg-ios-item-bg flex items-center justify-center mb-2.5 text-ios-textSecondary">
             <SFSymbol
               src="/symbols/SVG_Vector/05_cleaning_soap_bubbles.svg"
-              className="w-4 h-4"
+              className="w-5 h-5"
             />
           </div>
           <span className="text-[13px] font-semibold text-ios-text block">

@@ -35,6 +35,8 @@ export default {
         'ios-card-dark': '0 8px 30px -4px rgba(0, 0, 0, 0.4), 0 2px 8px -2px rgba(0, 0, 0, 0.3)',
         'ios-dock': '0 10px 30px -5px rgba(0, 0, 0, 0.15)',
         'ios-dock-dark': '0 12px 35px -5px rgba(0, 0, 0, 0.6)',
+        'glow-accent': '0 0 24px -2px var(--ios-accent-glow)',
+        'glow-blue': '0 0 24px -2px rgba(0, 122, 255, 0.45)',
         'glow-orange': '0 0 24px -2px rgba(255, 149, 0, 0.4)',
         'glow-green': '0 0 24px -2px rgba(52, 199, 89, 0.35)',
       },
