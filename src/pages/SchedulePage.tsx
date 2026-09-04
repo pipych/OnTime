@@ -101,6 +101,19 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
 
   useEffect(() => {
     loadCharges();
+
+    // Auto-refresh charges whenever user returns to the app
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadCharges();
+      }
+    };
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
+    };
   }, [loadCharges]);
 
   // Toggle single device
@@ -109,18 +122,23 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     const fullKey = `CHG_${currentWeekId}_${deviceKey}`;
     const newStatus = !charges[fullKey];
 
-    // Optimistic UI
-    setCharges((prev) => ({
-      ...prev,
-      [fullKey]: newStatus,
-    }));
+    // Optimistic UI with clean deletion when unchecking
+    setCharges((prev) => {
+      const updated = { ...prev };
+      if (newStatus) {
+        updated[fullKey] = true;
+      } else {
+        delete updated[fullKey];
+      }
+      return updated;
+    });
 
     if (newStatus) {
       onHapticSuccess?.();
     }
 
-    // Sync to GAS & localStorage
-    toggleChargeGAS(currentWeekId, deviceKey, newStatus);
+    // Sync to GAS & localStorage in background
+    toggleChargeGAS(currentWeekId, deviceKey, newStatus).catch(() => {});
   };
 
   // Charge all items for current day
@@ -138,7 +156,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
       return updated;
     });
 
-    chargeAllGAS(currentWeekId, items);
+    chargeAllGAS(currentWeekId, items).catch(() => {});
   };
 
   // Week slide animation direction

@@ -4,12 +4,17 @@ import { getWeekId } from '../utils/date';
 const LOCAL_STORAGE_KEY_PREFIX = 'vchasno_charges_';
 const GAS_URL_KEY = 'vchasno_gas_url';
 
-// Default URL or fallback to empty (user can configure via UI or .env)
+export const DEFAULT_GAS_API_URL =
+  'https://script.google.com/macros/s/AKfycby9jVlbmoAnf48T2nMd5a_RYZXGGo38sWYsDgUrUoSDp5Oku2drTK-59Udna76FWIhq/exec';
+
+// Returns configured GAS URL or the active production bot deployment URL
 export function getGasApiUrl(): string {
-  if (typeof window === 'undefined') return '';
+  if (typeof window === 'undefined') return DEFAULT_GAS_API_URL;
   const stored = localStorage.getItem(GAS_URL_KEY);
-  if (stored) return stored;
-  return (import.meta as any).env?.VITE_GAS_API_URL || '';
+  if (stored && stored.trim().length > 15) return stored.trim();
+  const envUrl = (import.meta as any).env?.VITE_GAS_API_URL;
+  if (envUrl && envUrl.trim().length > 15) return envUrl.trim();
+  return DEFAULT_GAS_API_URL;
 }
 
 export function setGasApiUrl(url: string) {
@@ -49,7 +54,6 @@ export async function fetchChargesFromGAS(weekId: string = getWeekId()): Promise
   const cached = getLocalCharges(weekId);
 
   if (!gasUrl) {
-    // If no GAS URL configured, return local cache
     return cached;
   }
 
@@ -57,11 +61,12 @@ export async function fetchChargesFromGAS(weekId: string = getWeekId()): Promise
     const targetUrl = new URL(gasUrl);
     targetUrl.searchParams.set('action', 'get_charges');
     targetUrl.searchParams.set('week', weekId);
+    targetUrl.searchParams.set('_t', Date.now().toString());
 
     const response = await fetch(targetUrl.toString(), {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     });
 
@@ -72,13 +77,11 @@ export async function fetchChargesFromGAS(weekId: string = getWeekId()): Promise
 
     const data: WeekChargesResponse = await response.json();
     if (data && data.ok && data.charges) {
-      const parsedCharges: Record<string, boolean> = { ...cached };
-      // GAS keys are like "CHG_2026_W36_ITEM_TWS": "true"
+      const parsedCharges: Record<string, boolean> = {};
+      // Single source of truth from GAS
       for (const [key, value] of Object.entries(data.charges)) {
-        if (value === 'true' || value === true as any) {
+        if (value === 'true' || value === (true as any)) {
           parsedCharges[key] = true;
-        } else if (value === 'false' || value === false as any) {
-          parsedCharges[key] = false;
         }
       }
       saveLocalCharges(weekId, parsedCharges);
@@ -100,13 +103,17 @@ export async function toggleChargeGAS(
   newStatus: boolean
 ): Promise<void> {
   const fullKey = `CHG_${weekId}_${deviceKey}`;
-  
+
   // 1. Optimistic update in localStorage
   const current = getLocalCharges(weekId);
-  current[fullKey] = newStatus;
+  if (newStatus) {
+    current[fullKey] = true;
+  } else {
+    delete current[fullKey];
+  }
   saveLocalCharges(weekId, current);
 
-  // 2. Sync to GAS if URL available
+  // 2. Sync to GAS
   const gasUrl = getGasApiUrl();
   if (!gasUrl) return;
 
@@ -116,14 +123,9 @@ export async function toggleChargeGAS(
     targetUrl.searchParams.set('week', weekId);
     targetUrl.searchParams.set('item', deviceKey);
     targetUrl.searchParams.set('status', newStatus ? 'true' : 'false');
+    targetUrl.searchParams.set('_t', Date.now().toString());
 
-    // Use mode: 'no-cors' fallback for Google Apps Script redirects
-    fetch(targetUrl.toString(), {
-      method: 'GET',
-      mode: 'no-cors',
-    }).catch(err => {
-      console.warn('Background sync error to GAS:', err);
-    });
+    await fetch(targetUrl.toString());
   } catch (e) {
     console.warn('Failed to dispatch sync request to GAS:', e);
   }
@@ -149,12 +151,10 @@ export async function chargeAllGAS(weekId: string, deviceKeys: DeviceKey[]): Pro
     targetUrl.searchParams.set('action', 'charge_all');
     targetUrl.searchParams.set('week', weekId);
     targetUrl.searchParams.set('items', deviceKeys.join(','));
+    targetUrl.searchParams.set('_t', Date.now().toString());
 
-    fetch(targetUrl.toString(), {
-      method: 'GET',
-      mode: 'no-cors',
-    }).catch(err => {
-      console.warn('Background sync charge_all error:', err);
-    });
-  } catch (e) {}
+    await fetch(targetUrl.toString());
+  } catch (e) {
+    console.warn('Failed to sync charge_all to GAS:', e);
+  }
 }

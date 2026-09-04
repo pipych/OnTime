@@ -196,9 +196,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 text-[12px] text-ios-textSecondary">
-                    <span>{device.category}</span>
-                    <span>•</span>
+                  <div className="text-[12px]">
                     <span className={isCharged ? 'text-ios-green font-medium' : 'text-ios-textSecondary'}>
                       {isCharged ? 'Заряжено' : 'Ожидает зарядки'}
                     </span>
