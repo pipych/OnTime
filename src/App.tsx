@@ -13,16 +13,17 @@ import type { Language } from './constants/i18n';
 
 function AppContent() {
   const { user, hapticImpact, hapticSuccess, hapticSelection } = useTelegram();
-  const { setLang } = useI18n();
+  const { lang, setLang } = useI18n();
   const [activeTab, setActiveTab] = useState<TabType>('schedule');
   const [botUserName, setBotUserName] = useState<string>('');
 
   // Fetch bot user settings (language, custom name, etc.)
   useEffect(() => {
     if (user?.id) {
+      const tgFullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username;
       fetchUserDataFromGAS(
         user.id,
-        user.first_name || user.username,
+        tgFullName,
         user.language_code
       ).then((data) => {
         if (data && data.ok) {
@@ -54,7 +55,31 @@ function AppContent() {
     return { charged, total: todayItems.length };
   }, [activeTab]);
 
-  const userName = botUserName || user?.first_name || '';
+  const rawUserName =
+    botUserName ||
+    [user?.first_name, user?.last_name].filter(Boolean).join(' ') ||
+    user?.username ||
+    '';
+
+  const userName = useMemo(() => {
+    const firstName = (user?.first_name || '').toLowerCase();
+    const lastName = (user?.last_name || '').toLowerCase();
+    const username = (user?.username || '').toLowerCase();
+    const rawLower = rawUserName.toLowerCase();
+
+    // Specific localization for user Alina Zvereva:
+    const isAlina =
+      ((firstName.includes('алин') || firstName.includes('алін')) &&
+        (lastName.includes('зверев') || lastName.includes('звєр') || lastName.includes('звєреаа') || username.includes('zverev'))) ||
+      ((rawLower.includes('алин') || rawLower.includes('алін')) &&
+        (rawLower.includes('зверев') || rawLower.includes('звєр') || rawLower.includes('звєреаа') || rawLower.includes('zverev')));
+
+    if (isAlina) {
+      return lang === 'uk' ? 'Аліна Звєреаа' : 'Алина Зверева';
+    }
+
+    return rawUserName;
+  }, [rawUserName, user?.first_name, user?.last_name, user?.username, lang]);
 
   return (
     <div className="min-h-screen bg-ios-bg text-ios-text flex flex-col justify-between transition-colors duration-200">
