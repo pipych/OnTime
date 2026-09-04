@@ -1,7 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
 import type { DayInfo } from '../types';
-import { SFSymbol } from './SFSymbol';
 
 interface WeekStripProps {
   days: DayInfo[];
@@ -11,7 +10,7 @@ interface WeekStripProps {
   onPrevWeek?: () => void;
   onNextWeek?: () => void;
   onToday?: () => void;
-  weekRangeStr: string;
+  weekRangeStr?: string;
   slideDirection?: 'left' | 'right' | null;
 }
 
@@ -22,8 +21,6 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
   charges,
   onPrevWeek,
   onNextWeek,
-  onToday,
-  weekRangeStr,
   slideDirection = null,
 }) => {
   const [touchStartX, setTouchStartX] = React.useState<number | null>(null);
@@ -76,53 +73,10 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
 
   return (
     <div
-      className="w-full mb-5 select-none touch-pan-y overflow-visible"
+      className="w-full mb-3 select-none touch-pan-y overflow-visible"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Header bar: Week Range & Navigation */}
-      <div className="flex items-center justify-between mb-3 px-1">
-        <div className="flex items-center gap-2.5">
-          <span className="text-[14px] font-semibold tracking-tight text-ios-text">
-            {weekRangeStr}
-          </span>
-          {onToday && (
-            <button
-              onClick={onToday}
-              className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-ios-red/15 text-ios-red hover:bg-ios-red/25 active:scale-95 transition-all"
-            >
-              Сегодня
-            </button>
-          )}
-        </div>
-
-        {/* Prev / Next week arrows */}
-        {(onPrevWeek || onNextWeek) && (
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={onPrevWeek}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-all shadow-sm"
-              aria-label="Предыдущая неделя"
-            >
-              <SFSymbol
-                src="/symbols/SVG_Vector/15_back_chevron.svg"
-                className="w-5 h-5"
-              />
-            </button>
-            <button
-              onClick={onNextWeek}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-all shadow-sm"
-              aria-label="Следующая неделя"
-            >
-              <SFSymbol
-                src="/symbols/SVG_Vector/15_back_chevron.svg"
-                className="w-5 h-5 rotate-180"
-              />
-            </button>
-          </div>
-        )}
-      </div>
-
       {/* Days Strip with animated slide and unclipped overflow */}
       <div
         key={days[0]?.isoDate}

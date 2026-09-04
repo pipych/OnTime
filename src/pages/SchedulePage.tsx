@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import clsx from 'clsx';
 import type { DayInfo, DeviceKey } from '../types';
-import { getDaysForWeek, getWeekId, getWeekRangeStr, formatISODate } from '../utils/date';
+import { getDaysForWeek, getWeekId, formatISODate } from '../utils/date';
 import { WeekStrip } from '../components/WeekStrip';
 import { DeviceChecklist } from '../components/DeviceChecklist';
-import { CHARGE_DAYS_MAP } from '../constants/devices';
+import { SFSymbol } from '../components/SFSymbol';
+import { CHARGE_DAYS_MAP, DAYS_SHORT_RU } from '../constants/devices';
 import {
   fetchChargesFromGAS,
   toggleChargeGAS,
@@ -36,8 +37,6 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
   const [charges, setCharges] = useState<Record<string, boolean>>(() =>
     getLocalCharges(getWeekId(new Date()))
   );
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [syncStatus, setSyncStatus] = useState<'synced' | 'local' | 'error'>('synced');
 
   // Days list for the current week
   const weekDays = useMemo(() => {
@@ -48,9 +47,9 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     return getWeekId(referenceDate);
   }, [referenceDate]);
 
-  const weekRangeStr = useMemo(() => {
-    return getWeekRangeStr(referenceDate);
-  }, [referenceDate]);
+  // Today's date reference for header display (strictly today's calendar date)
+  const todayDayNumber = new Date().getDate();
+  const todayShortName = DAYS_SHORT_RU[new Date().getDay()];
 
   // The currently selected day object
   const selectedDay = useMemo(() => {
@@ -102,18 +101,12 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     // 2. Fetch from GAS
     const gasUrl = getGasApiUrl();
     if (gasUrl) {
-      setIsLoading(true);
       try {
         const gasCharges = await fetchChargesFromGAS(currentWeekId);
         setCharges(gasCharges);
-        setSyncStatus('synced');
       } catch (e) {
-        setSyncStatus('local');
-      } finally {
-        setIsLoading(false);
+        // Cached local charges remain active
       }
-    } else {
-      setSyncStatus('local');
     }
   }, [currentWeekId]);
 
@@ -204,36 +197,41 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     setSelectedIsoDate(formatISODate(d));
   };
 
-  const handleToday = () => {
-    onHapticImpact?.('medium');
-    setSlideDirection(null);
-    const now = new Date();
-    setReferenceDate(now);
-    setSelectedIsoDate(formatISODate(now));
-  };
-
   return (
     <div className="w-full max-w-lg mx-auto px-4 pt-3 pb-36 space-y-4 animate-fadeIn">
-      {/* Top Header: Date Number + Red Short Day of Week */}
+      {/* Top Header: Today's Date Number + Red Short Day of Week + Week Navigation Buttons */}
       <div className="flex items-center justify-between">
         <div className="flex items-baseline gap-2.5">
-          <span className="text-[38px] font-extrabold text-ios-text tracking-tight leading-none">
-            {selectedDay.dayOfMonth}
+          <span className="text-[54px] font-black text-ios-text tracking-tight leading-none">
+            {todayDayNumber}
           </span>
           <span className="text-[26px] font-bold text-ios-red tracking-tight leading-none">
-            {selectedDay.shortName}
+            {todayShortName}
           </span>
-          <span
-            className={clsx(
-              'w-2 h-2 rounded-full mb-1 transition-all',
-              isLoading
-                ? 'bg-ios-red animate-pulse'
-                : syncStatus === 'synced'
-                ? 'bg-ios-green'
-                : 'bg-ios-red'
-            )}
-            title={isLoading ? 'Синхронизация...' : syncStatus === 'synced' ? 'Синхронизировано' : 'Локальный режим'}
-          />
+        </div>
+
+        {/* Week navigation buttons on the same row as header */}
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={handlePrevWeek}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-all shadow-sm"
+            aria-label="Предыдущая неделя"
+          >
+            <SFSymbol
+              src="/symbols/SVG_Vector/15_back_chevron.svg"
+              className="w-5 h-5"
+            />
+          </button>
+          <button
+            onClick={handleNextWeek}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-all shadow-sm"
+            aria-label="Следующая неделя"
+          >
+            <SFSymbol
+              src="/symbols/SVG_Vector/15_back_chevron.svg"
+              className="w-5 h-5 rotate-180"
+            />
+          </button>
         </div>
       </div>
 
@@ -245,15 +243,13 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
         charges={charges}
         onPrevWeek={handlePrevWeek}
         onNextWeek={handleNextWeek}
-        onToday={handleToday}
-        weekRangeStr={weekRangeStr}
         slideDirection={slideDirection}
       />
 
-      {/* Progress bar directly under the calendar, without card or percentages */}
+      {/* Progress bar directly under the calendar, without card or percentages, and without border */}
       {selectedTotalCount > 0 && (
         <div className="w-full px-1 -mt-1 mb-1">
-          <div className="w-full h-1.5 rounded-full bg-ios-card border border-ios-border/80 overflow-hidden">
+          <div className="w-full h-1.5 rounded-full bg-ios-cardSubtle overflow-hidden">
             <div
               className={clsx(
                 'h-full rounded-full transition-all duration-300 ease-out',
