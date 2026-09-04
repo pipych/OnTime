@@ -41,7 +41,6 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
     (i) => charges[`CHG_${day.weekId}_${i.key}`]
   ).length;
   const isAllCharged = totalCount > 0 && chargedCount === totalCount;
-  const percent = totalCount > 0 ? Math.round((chargedCount / totalCount) * 100) : 100;
 
   // 2D side-cannon confetti on reaching 100%
   const userInteractedRef = useRef<boolean>(false);
@@ -77,55 +76,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
 
   return (
     <div className="w-full space-y-4">
-      {/* Day summary card */}
-      <div className="p-4 rounded-ios bg-ios-card border border-ios-border shadow-ios-card dark:shadow-ios-card-dark transition-all">
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <h2 className="text-[20px] font-bold tracking-tight text-ios-text flex items-center gap-2">
-              <span>{day.fullName}</span>
-              {day.isToday && (
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-ios-accent text-white">
-                  Сегодня
-                </span>
-              )}
-            </h2>
-            <p className="text-[13px] text-ios-textSecondary">
-              {totalCount === 0
-                ? 'Нет устройств для зарядки'
-                : `Заряжено ${chargedCount} из ${totalCount} устройств (${percent}%)`}
-            </p>
-          </div>
 
-          {/* Mini progress circle or badge */}
-          {totalCount > 0 && (
-            <div
-              className={clsx(
-                'w-12 h-12 rounded-full flex flex-col items-center justify-center font-bold text-[13px] border-2 transition-colors',
-                isAllCharged
-                  ? 'border-ios-green bg-ios-green/10 text-ios-green'
-                  : chargedCount > 0
-                  ? 'border-ios-accent bg-ios-accent/10 text-ios-accent'
-                  : 'border-ios-border bg-ios-cardSubtle text-ios-textSecondary'
-              )}
-            >
-              <span>{percent}%</span>
-            </div>
-          )}
-        </div>
-
-        {/* Progress bar line */}
-        {totalCount > 0 && (
-          <div className="w-full h-1.5 rounded-full bg-ios-item-bg overflow-hidden mt-2">
-            <div
-              className={clsx(
-                'h-full rounded-full transition-all duration-300 ease-out',
-                isAllCharged ? 'bg-ios-green' : 'bg-ios-accent'
-              )}
-              style={{ width: `${percent}%` }}
-            />
-          </div>
-        )}
-      </div>
 
       {/* Sunday Alert Banner if there are uncharged devices */}
       {isSunday && sundayUnchargedItems.length > 0 && (

@@ -89,7 +89,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
           {onToday && (
             <button
               onClick={onToday}
-              className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-ios-accent/15 text-ios-accent hover:bg-ios-accent/25 active:scale-95 transition-all"
+              className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-ios-red/15 text-ios-red hover:bg-ios-red/25 active:scale-95 transition-all"
             >
               Сегодня
             </button>
@@ -143,35 +143,22 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
               className={clsx(
                 'w-full py-2.5 px-0.5 rounded-[18px] flex flex-col items-center justify-between transition-all duration-200 ease-out relative',
                 isSelected
-                  ? 'bg-ios-accent text-white shadow-glow-accent scale-[1.04] z-10'
-                  : 'bg-ios-card border border-ios-border text-ios-text hover:border-ios-accent/40 active:scale-95'
+                  ? 'bg-ios-red text-white shadow-glow-red scale-[1.04] z-10'
+                  : 'bg-ios-card border border-ios-border hover:border-ios-red/40 active:scale-95'
               )}
             >
-              {/* Day of Week Name */}
+              {/* Day of Week Name: white if selected, red if unselected */}
               <span
                 className={clsx(
-                  'text-[12px] font-medium tracking-tight mb-1',
-                  isSelected
-                    ? 'text-white/90 font-semibold'
-                    : day.isToday
-                    ? 'text-ios-accent font-semibold'
-                    : 'text-ios-textSecondary'
+                  'text-[12px] font-semibold tracking-tight mb-1',
+                  isSelected ? 'text-white' : 'text-ios-red'
                 )}
               >
                 {day.shortName}
               </span>
 
-              {/* Day Number */}
-              <span
-                className={clsx(
-                  'text-[17px] font-bold leading-none my-0.5 tracking-tight',
-                  isSelected
-                    ? 'text-white'
-                    : day.isToday
-                    ? 'text-ios-accent'
-                    : 'text-ios-text'
-                )}
-              >
+              {/* Day Number: white always */}
+              <span className="text-[17px] font-bold leading-none my-0.5 tracking-tight text-white">
                 {day.dayOfMonth}
               </span>
 
@@ -197,7 +184,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
                   <span
                     className={clsx(
                       'w-1 h-1 rounded-full',
-                      isSelected ? 'bg-white/40' : 'bg-ios-textSecondary/30'
+                      isSelected ? 'bg-white/40' : 'bg-white/20'
                     )}
                   />
                 )}
@@ -205,7 +192,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
 
               {/* Today marker pill top-badge */}
               {day.isToday && !isSelected && (
-                <span className="absolute -top-1 w-1.5 h-1.5 rounded-full bg-ios-accent" />
+                <span className="absolute -top-1 w-1.5 h-1.5 rounded-full bg-ios-red" />
               )}
             </button>
           );

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import clsx from 'clsx';
 import type { DayInfo, DeviceKey } from '../types';
 import { getDaysForWeek, getWeekId, getWeekRangeStr, formatISODate } from '../utils/date';
 import { WeekStrip } from '../components/WeekStrip';
@@ -74,6 +75,27 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     }
     return uncharged;
   }, [charges, currentWeekId]);
+
+  // Statistics for selected day (for progress bar under calendar)
+  const selectedDayItems = useMemo(() => {
+    const isSunday = selectedDay.dayOfWeek === 0;
+    const items: DeviceKey[] = [...selectedDay.deviceKeys];
+    if (isSunday && sundayUnchargedItems.length > 0) {
+      sundayUnchargedItems.forEach((k) => {
+        if (!items.includes(k)) items.push(k);
+      });
+    }
+    return items;
+  }, [selectedDay, sundayUnchargedItems]);
+
+  const selectedTotalCount = selectedDayItems.length;
+  const selectedChargedCount = selectedDayItems.filter(
+    (k) => charges[`CHG_${currentWeekId}_${k}`]
+  ).length;
+  const isSelectedAllCharged = selectedTotalCount > 0 && selectedChargedCount === selectedTotalCount;
+  const selectedPercent = selectedTotalCount > 0
+    ? Math.round((selectedChargedCount / selectedTotalCount) * 100)
+    : 0;
 
   // Load charges from cache & GAS
   const loadCharges = useCallback(async () => {
@@ -202,15 +224,18 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
 
   return (
     <div className="w-full max-w-lg mx-auto px-4 pt-3 pb-36 space-y-4 animate-fadeIn">
-      {/* Top Header */}
+      {/* Top Header: Date Number + Red Short Day of Week */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <h1 className="text-[30px] font-bold text-ios-text tracking-tight">
-            Зарядки
-          </h1>
+        <div className="flex items-baseline gap-2.5">
+          <span className="text-[38px] font-extrabold text-ios-text tracking-tight leading-none">
+            {selectedDay.dayOfMonth}
+          </span>
+          <span className="text-[26px] font-bold text-ios-red tracking-tight leading-none">
+            {selectedDay.shortName}
+          </span>
           <span
-            className={`w-2.5 h-2.5 rounded-full mt-1.5 ${
-              syncStatus === 'synced' ? 'bg-ios-green' : 'bg-ios-accent'
+            className={`w-2 h-2 rounded-full mb-1 ${
+              syncStatus === 'synced' ? 'bg-ios-green' : 'bg-ios-red'
             }`}
             title={syncStatus === 'synced' ? 'Синхронизировано' : 'Локальный режим'}
           />
@@ -227,7 +252,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
           >
             <SFSymbol
               src="/symbols/SVG_Vector/08_schedule_calendar_clock.svg"
-              className={`w-6 h-6 ${isLoading ? 'animate-spin text-ios-accent' : ''}`}
+              className={`w-6 h-6 ${isLoading ? 'animate-spin text-ios-red' : ''}`}
             />
           </button>
           <button
@@ -256,6 +281,21 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
         weekRangeStr={weekRangeStr}
         slideDirection={slideDirection}
       />
+
+      {/* Progress bar directly under the calendar, without card or percentages */}
+      {selectedTotalCount > 0 && (
+        <div className="w-full px-1 -mt-1 mb-1">
+          <div className="w-full h-1.5 rounded-full bg-ios-card border border-ios-border/80 overflow-hidden">
+            <div
+              className={clsx(
+                'h-full rounded-full transition-all duration-300 ease-out',
+                isSelectedAllCharged ? 'bg-ios-green' : 'bg-ios-red'
+              )}
+              style={{ width: `${selectedPercent}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Device Checklist for Selected Day */}
       <DeviceChecklist
