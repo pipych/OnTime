@@ -4,7 +4,6 @@ import type { DayInfo, DeviceKey } from '../types';
 import { getDaysForWeek, getWeekId, getWeekRangeStr, formatISODate } from '../utils/date';
 import { WeekStrip } from '../components/WeekStrip';
 import { DeviceChecklist } from '../components/DeviceChecklist';
-import { SFSymbol } from '../components/SFSymbol';
 import { CHARGE_DAYS_MAP } from '../constants/devices';
 import {
   fetchChargesFromGAS,
@@ -12,7 +11,6 @@ import {
   chargeAllGAS,
   getLocalCharges,
   getGasApiUrl,
-  setGasApiUrl,
 } from '../services/api';
 
 interface SchedulePageProps {
@@ -39,8 +37,6 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     getLocalCharges(getWeekId(new Date()))
   );
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showSettingsModal, setShowSettingsModal] = useState<boolean>(false);
-  const [gasUrlInput, setGasUrlInput] = useState<string>(() => getGasApiUrl());
   const [syncStatus, setSyncStatus] = useState<'synced' | 'local' | 'error'>('synced');
 
   // Days list for the current week
@@ -216,12 +212,6 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     setSelectedIsoDate(formatISODate(now));
   };
 
-  const handleSaveGasUrl = () => {
-    setGasApiUrl(gasUrlInput);
-    setShowSettingsModal(false);
-    loadCharges();
-  };
-
   return (
     <div className="w-full max-w-lg mx-auto px-4 pt-3 pb-36 space-y-4 animate-fadeIn">
       {/* Top Header: Date Number + Red Short Day of Week */}
@@ -234,38 +224,16 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
             {selectedDay.shortName}
           </span>
           <span
-            className={`w-2 h-2 rounded-full mb-1 ${
-              syncStatus === 'synced' ? 'bg-ios-green' : 'bg-ios-red'
-            }`}
-            title={syncStatus === 'synced' ? 'Синхронизировано' : 'Локальный режим'}
+            className={clsx(
+              'w-2 h-2 rounded-full mb-1 transition-all',
+              isLoading
+                ? 'bg-ios-red animate-pulse'
+                : syncStatus === 'synced'
+                ? 'bg-ios-green'
+                : 'bg-ios-red'
+            )}
+            title={isLoading ? 'Синхронизация...' : syncStatus === 'synced' ? 'Синхронизировано' : 'Локальный режим'}
           />
-        </div>
-
-        {/* Sync / Settings button */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={loadCharges}
-            disabled={isLoading}
-            className="w-11 h-11 rounded-full flex items-center justify-center bg-ios-card border border-ios-border text-ios-textSecondary hover:text-ios-text active:scale-95 transition-all shadow-sm"
-            title="Обновить данные"
-            aria-label="Обновить данные"
-          >
-            <SFSymbol
-              src="/symbols/SVG_Vector/08_schedule_calendar_clock.svg"
-              className={`w-6 h-6 ${isLoading ? 'animate-spin text-ios-red' : ''}`}
-            />
-          </button>
-          <button
-            onClick={() => setShowSettingsModal(true)}
-            className="w-11 h-11 rounded-full flex items-center justify-center bg-ios-card border border-ios-border text-ios-textSecondary hover:text-ios-text active:scale-95 transition-all shadow-sm"
-            title="Настройки подключения"
-            aria-label="Настройки подключения"
-          >
-            <SFSymbol
-              src="/symbols/SVG_Vector/11_settings_gear.svg"
-              className="w-6 h-6"
-            />
-          </button>
         </div>
       </div>
 
@@ -305,61 +273,6 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
         onChargeAll={handleChargeAll}
         sundayUnchargedItems={sundayUnchargedItems}
       />
-
-      {/* Settings Modal (GAS URL Configuration) */}
-      {showSettingsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-md p-5 rounded-ios-lg bg-ios-card border border-ios-border shadow-2xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-[18px] font-bold text-ios-text">
-                Подключение к боту
-              </h3>
-              <button
-                onClick={() => setShowSettingsModal(false)}
-                className="w-9 h-9 rounded-full flex items-center justify-center bg-ios-item-bg text-ios-textSecondary hover:text-ios-text active:scale-95 transition-all"
-              >
-                <SFSymbol
-                  src="/symbols/SVG_Vector/12_close_xmark.svg"
-                  className="w-5 h-5"
-                />
-              </button>
-            </div>
-
-            <p className="text-[13px] text-ios-textSecondary leading-relaxed">
-              Укажите URL опубликованного веб-приложения Google Apps Script бота (Web App URL).
-              Все отметки будут синхронизироваться в реальном времени с ботом.
-            </p>
-
-            <div className="space-y-1.5">
-              <label className="text-[12px] font-semibold text-ios-textSecondary block">
-                Google Apps Script Web App URL:
-              </label>
-              <input
-                type="url"
-                value={gasUrlInput}
-                onChange={(e) => setGasUrlInput(e.target.value)}
-                placeholder="https://script.google.com/macros/s/.../exec"
-                className="w-full p-3 rounded-ios-sm bg-ios-cardSubtle border border-ios-border text-ios-text text-[13px] outline-none focus:border-ios-accent transition-colors"
-              />
-            </div>
-
-            <div className="pt-2 flex items-center justify-end gap-2">
-              <button
-                onClick={() => setShowSettingsModal(false)}
-                className="px-4 py-2.5 rounded-full text-ios-textSecondary font-medium text-[14px] hover:text-ios-text"
-              >
-                Отмена
-              </button>
-              <button
-                onClick={handleSaveGasUrl}
-                className="px-5 py-2.5 rounded-full bg-ios-accent text-white font-semibold text-[14px] shadow-glow-accent active:scale-95 transition-all"
-              >
-                Сохранить
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
