@@ -16,23 +16,18 @@ export const HomePage: React.FC<HomePageProps> = ({
     <div className="w-full max-w-lg mx-auto px-4 pt-4 pb-36 space-y-5 animate-fadeIn">
       {/* Top Welcome Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <span className="text-[13px] font-semibold uppercase tracking-wider text-ios-textSecondary">
-            Помощник
-          </span>
-          <h1 className="text-[28px] font-bold text-ios-text tracking-tight mt-0.5">
-            Вчасно
-          </h1>
-        </div>
+        <h1 className="text-[32px] font-bold text-ios-text tracking-tight">
+          Вчасно
+        </h1>
 
-        <div className="w-10 h-10 rounded-full bg-ios-accent/15 border border-ios-accent/30 flex items-center justify-center text-ios-accent font-bold text-[15px]">
+        <div className="w-11 h-11 rounded-full bg-ios-accent/15 border border-ios-accent/30 flex items-center justify-center text-ios-accent font-bold text-[16px] shadow-sm">
           {userName.charAt(0).toUpperCase()}
         </div>
       </div>
 
-      {/* Hero Welcome Card */}
-      <div className="p-5 rounded-ios bg-ios-card border border-ios-border shadow-ios-card dark:shadow-ios-card-dark relative overflow-hidden">
-        <div className="relative z-10 space-y-2">
+      {/* Hero Welcome Card with unclipped shadow */}
+      <div className="rounded-ios bg-ios-card border border-ios-border shadow-ios-card dark:shadow-ios-card-dark relative">
+        <div className="p-5 relative z-10 space-y-2">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-ios-green/15 text-ios-green text-[12px] font-semibold">
             <span className="w-2 h-2 rounded-full bg-ios-green animate-pulse" />
             <span>Система активна</span>
@@ -46,8 +41,10 @@ export const HomePage: React.FC<HomePageProps> = ({
           </p>
         </div>
 
-        {/* Ambient background glow */}
-        <div className="absolute -right-8 -bottom-8 w-36 h-36 bg-ios-accent/10 rounded-full blur-2xl pointer-events-none" />
+        {/* Ambient background glow inside clipped overlay */}
+        <div className="absolute inset-0 rounded-ios overflow-hidden pointer-events-none">
+          <div className="absolute -right-8 -bottom-8 w-36 h-36 bg-ios-accent/10 rounded-full blur-2xl" />
+        </div>
       </div>
 
       {/* Quick Widget: Charges Today */}
@@ -57,17 +54,17 @@ export const HomePage: React.FC<HomePageProps> = ({
       >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-ios-accent/15 text-ios-accent flex items-center justify-center flex-shrink-0">
+            <div className="w-13 h-13 rounded-2xl bg-ios-accent/15 text-ios-accent flex items-center justify-center flex-shrink-0">
               <SFSymbol
                 src="/symbols/SVG_Vector/01_charge_bolt.svg"
-                className="w-6 h-6 text-ios-accent"
+                className="w-7 h-7 text-ios-accent"
               />
             </div>
             <div>
-              <h3 className="text-[16px] font-semibold text-ios-text group-hover:text-ios-accent transition-colors">
-                График зарядок
+              <h3 className="text-[17px] font-semibold text-ios-text group-hover:text-ios-accent transition-colors">
+                Зарядки
               </h3>
-              <p className="text-[12px] text-ios-textSecondary">
+              <p className="text-[13px] text-ios-textSecondary">
                 {chargesCount.total > 0
                   ? `Сегодня заряжено ${chargesCount.charged} из ${chargesCount.total}`
                   : 'Проверить устройства'}

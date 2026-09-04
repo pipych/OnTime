@@ -178,22 +178,16 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     <div className="w-full max-w-lg mx-auto px-4 pt-3 pb-36 space-y-4 animate-fadeIn">
       {/* Top Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <span className="text-[12px] font-semibold uppercase tracking-wider text-ios-textSecondary">
-            График недели
-          </span>
-          <h1 className="text-[26px] font-bold text-ios-text tracking-tight flex items-center gap-2">
-            <span>Зарядка</span>
-            <span className="text-[13px] font-medium text-ios-textSecondary flex items-center gap-1.5">
-              <span>(Неделя {currentWeekId.split('_W')[1]})</span>
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  syncStatus === 'synced' ? 'bg-ios-green' : 'bg-ios-orange'
-                }`}
-                title={syncStatus === 'synced' ? 'Синхронизировано' : 'Локальный режим'}
-              />
-            </span>
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-[30px] font-bold text-ios-text tracking-tight">
+            Зарядки
           </h1>
+          <span
+            className={`w-2.5 h-2.5 rounded-full mt-1.5 ${
+              syncStatus === 'synced' ? 'bg-ios-green' : 'bg-ios-accent'
+            }`}
+            title={syncStatus === 'synced' ? 'Синхронизировано' : 'Локальный режим'}
+          />
         </div>
 
         {/* Sync / Settings button */}
@@ -201,24 +195,24 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
           <button
             onClick={loadCharges}
             disabled={isLoading}
-            className="w-10 h-10 rounded-full flex items-center justify-center bg-ios-card border border-ios-border text-ios-textSecondary hover:text-ios-text active:scale-95 transition-all shadow-sm"
+            className="w-11 h-11 rounded-full flex items-center justify-center bg-ios-card border border-ios-border text-ios-textSecondary hover:text-ios-text active:scale-95 transition-all shadow-sm"
             title="Обновить данные"
             aria-label="Обновить данные"
           >
             <SFSymbol
               src="/symbols/SVG_Vector/08_schedule_calendar_clock.svg"
-              className={`w-5 h-5 ${isLoading ? 'animate-spin text-ios-accent' : ''}`}
+              className={`w-6 h-6 ${isLoading ? 'animate-spin text-ios-accent' : ''}`}
             />
           </button>
           <button
             onClick={() => setShowSettingsModal(true)}
-            className="w-10 h-10 rounded-full flex items-center justify-center bg-ios-card border border-ios-border text-ios-textSecondary hover:text-ios-text active:scale-95 transition-all shadow-sm"
+            className="w-11 h-11 rounded-full flex items-center justify-center bg-ios-card border border-ios-border text-ios-textSecondary hover:text-ios-text active:scale-95 transition-all shadow-sm"
             title="Настройки подключения"
             aria-label="Настройки подключения"
           >
             <SFSymbol
               src="/symbols/SVG_Vector/11_settings_gear.svg"
-              className="w-5 h-5"
+              className="w-6 h-6"
             />
           </button>
         </div>

@@ -35,7 +35,7 @@ export function App() {
   return (
     <div className="min-h-screen bg-ios-bg text-ios-text flex flex-col justify-between transition-colors duration-200">
       {/* Safe Area Top Spacer for Telegram UI & Notch */}
-      <div className="w-full pt-[max(calc(env(safe-area-inset-top,0px)+56px),64px)]" />
+      <div className="w-full pt-[max(calc(env(safe-area-inset-top,0px)+76px),88px)]" />
 
       {/* Main Content Area */}
       <main className="flex-1 w-full flex flex-col">

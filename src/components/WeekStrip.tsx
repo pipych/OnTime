@@ -24,6 +24,35 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
   onToday,
   weekRangeStr,
 }) => {
+  const [touchStartX, setTouchStartX] = React.useState<number | null>(null);
+  const [touchStartY, setTouchStartY] = React.useState<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+    setTouchStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null || touchStartY === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+
+    // Minimum swipe threshold of 40px and predominantly horizontal
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
+      if (deltaX < 0) {
+        onNextWeek?.();
+      } else {
+        onPrevWeek?.();
+      }
+    }
+
+    setTouchStartX(null);
+    setTouchStartY(null);
+  };
+
   /**
    * Calculate day completion status
    */
@@ -44,17 +73,21 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
   };
 
   return (
-    <div className="w-full mb-5">
+    <div
+      className="w-full mb-5 select-none touch-pan-y"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Header bar: Week Range & Navigation */}
       <div className="flex items-center justify-between mb-3 px-1">
-        <div className="flex items-center gap-2">
-          <span className="text-[13px] font-semibold uppercase tracking-wider text-ios-textSecondary">
+        <div className="flex items-center gap-2.5">
+          <span className="text-[14px] font-semibold tracking-tight text-ios-text">
             {weekRangeStr}
           </span>
           {onToday && (
             <button
               onClick={onToday}
-              className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-ios-accent/15 text-ios-accent hover:bg-ios-accent/25 transition-colors active:scale-95"
+              className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-ios-accent/15 text-ios-accent hover:bg-ios-accent/25 active:scale-95 transition-all"
             >
               Сегодня
             </button>
@@ -66,30 +99,30 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
           <div className="flex items-center gap-1.5">
             <button
               onClick={onPrevWeek}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-all"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-all shadow-sm"
               aria-label="Предыдущая неделя"
             >
               <SFSymbol
                 src="/symbols/SVG_Vector/15_back_chevron.svg"
-                className="w-4 h-4"
+                className="w-4.5 h-4.5"
               />
             </button>
             <button
               onClick={onNextWeek}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-all"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-ios-textSecondary hover:text-ios-text bg-ios-card border border-ios-border active:scale-90 transition-all shadow-sm"
               aria-label="Следующая неделя"
             >
               <SFSymbol
                 src="/symbols/SVG_Vector/15_back_chevron.svg"
-                className="w-4 h-4 rotate-180"
+                className="w-4.5 h-4.5 rotate-180"
               />
             </button>
           </div>
         )}
       </div>
 
-      {/* Days Horizontal Strip */}
-      <div className="flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar py-1 px-0.5">
+      {/* Days Horizontal Strip with ample padding so shadows/glow don't clip */}
+      <div className="flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar py-3 px-1 -my-1">
         {days.map((day) => {
           const isSelected = day.isoDate === selectedDate;
           const status = getDayStatus(day);
