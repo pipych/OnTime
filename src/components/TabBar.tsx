@@ -21,7 +21,7 @@ export const TabBar: React.FC<TabBarProps> = ({
     {
       id: 'home',
       label: t.tabHome,
-      icon: '/symbols/SVG_Vector/06_cleaning_sparkles.svg',
+      icon: '/symbols/SVG_Vector/43_home_house.svg',
     },
     {
       id: 'schedule',
@@ -39,7 +39,7 @@ export const TabBar: React.FC<TabBarProps> = ({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center px-4 pb-[max(calc(env(safe-area-inset-bottom,0px)+26px),30px)] pointer-events-none">
-      <nav className="pointer-events-auto flex items-center justify-between gap-1.5 p-1.5 rounded-full backdrop-blur-2xl bg-[var(--ios-dock-bg)] shadow-ios-dock dark:shadow-ios-dock-dark transition-all duration-300">
+      <nav className="pointer-events-auto flex items-center justify-between gap-2 p-2 rounded-full backdrop-blur-2xl bg-[var(--ios-dock-bg)] shadow-ios-dock dark:shadow-ios-dock-dark transition-all duration-300">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -47,7 +47,7 @@ export const TabBar: React.FC<TabBarProps> = ({
               key={tab.id}
               onClick={() => handleSelect(tab.id)}
               className={clsx(
-                'relative flex flex-col items-center justify-center min-w-[100px] py-1.5 px-4 rounded-full transition-all duration-250 ease-out font-medium',
+                'relative flex flex-col items-center justify-center min-w-[108px] py-2.5 px-5 rounded-full transition-all duration-250 ease-out font-medium',
                 isActive
                   ? 'bg-ios-accent text-white shadow-glow-accent scale-[1.02]'
                   : 'text-ios-textSecondary hover:text-ios-text active:scale-95'
@@ -56,12 +56,12 @@ export const TabBar: React.FC<TabBarProps> = ({
               <SFSymbol
                 src={tab.icon}
                 className={clsx(
-                  'w-5 h-5 transition-transform duration-200 mb-0.5',
+                  'w-6 h-6 transition-transform duration-200 mb-1',
                   isActive ? 'scale-105 text-white' : 'text-ios-textSecondary'
                 )}
                 alt={tab.label}
               />
-              <span className="text-[11px] font-semibold tracking-tight leading-tight">
+              <span className="text-[11.5px] font-semibold tracking-tight leading-tight">
                 {tab.label}
               </span>
             </button>
