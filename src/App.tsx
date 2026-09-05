@@ -6,37 +6,64 @@ import { TabBar } from './components/TabBar';
 import { HomePage } from './pages/HomePage';
 import { SchedulePage } from './pages/SchedulePage';
 import { CHARGE_DAYS_MAP } from './constants/devices';
-import { getLocalCharges, fetchUserDataFromGAS } from './services/api';
+import { getLocalCharges, fetchUserDataFromGAS, fetchWeeklyDataFromGAS } from './services/api';
 import { getWeekId } from './utils/date';
 import { I18nProvider, useI18n } from './context/I18nContext';
 import type { Language } from './constants/i18n';
+import { SplashScreen } from './components/SplashScreen';
 
 function AppContent() {
   const { user, hapticImpact, hapticSuccess, hapticSelection } = useTelegram();
   const { lang, setLang } = useI18n();
   const [activeTab, setActiveTab] = useState<TabType>('schedule');
   const [botUserName, setBotUserName] = useState<string>('');
+  const [isDataReady, setIsDataReady] = useState<boolean>(false);
+  const [isSplashDone, setIsSplashDone] = useState<boolean>(false);
 
-  // Fetch bot user settings (language, custom name, etc.)
+  // Initial data loading coordinator (user profile + weekly schedule & charges)
   useEffect(() => {
-    if (user?.id) {
-      const tgFullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username;
-      fetchUserDataFromGAS(
-        user.id,
-        tgFullName,
-        user.language_code
-      ).then((data) => {
-        if (data && data.ok) {
-          if (data.lang) {
-            setLang(data.lang);
-          }
-          if (data.user_name) {
-            setBotUserName(data.user_name);
-          }
+    let isMounted = true;
+    const currentWeek = getWeekId(new Date());
+
+    const userPromise = user?.id
+      ? fetchUserDataFromGAS(
+          user.id,
+          [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username,
+          user.language_code
+        )
+      : Promise.resolve(null);
+
+    const weekPromise = fetchWeeklyDataFromGAS(currentWeek);
+
+    // Fallback safety timeout: splash screen will never hang indefinitely
+    const safetyTimer = window.setTimeout(() => {
+      if (isMounted) {
+        setIsDataReady(true);
+      }
+    }, 4500);
+
+    Promise.allSettled([userPromise, weekPromise]).then(([userRes]) => {
+      if (!isMounted) return;
+
+      if (userRes.status === 'fulfilled' && userRes.value && userRes.value.ok) {
+        if (userRes.value.lang) {
+          setLang(userRes.value.lang);
         }
-      });
-    }
-  }, [user?.id, setLang]);
+        if (userRes.value.user_name) {
+          setBotUserName(userRes.value.user_name);
+        }
+      }
+
+      window.clearTimeout(safetyTimer);
+      setIsDataReady(true);
+    });
+
+    return () => {
+      isMounted = false;
+      window.clearTimeout(safetyTimer);
+    };
+  }, [user?.id, user?.first_name, user?.last_name, user?.username, user?.language_code, setLang]);
+
 
   // Today charges summary for Home Page widget
   const todayChargesCount = useMemo(() => {
@@ -82,7 +109,15 @@ function AppContent() {
   }, [rawUserName, user?.first_name, user?.last_name, user?.username, lang]);
 
   return (
-    <div className="min-h-screen bg-ios-bg text-ios-text flex flex-col justify-between transition-colors duration-200">
+    <div className="min-h-screen bg-ios-bg text-ios-text flex flex-col justify-between transition-colors duration-200 relative">
+      {/* Startup Animated Splash Screen */}
+      {!isSplashDone && (
+        <SplashScreen
+          isDataReady={isDataReady}
+          onFinished={() => setIsSplashDone(true)}
+        />
+      )}
+
       {/* Safe Area Top Spacer for Telegram UI & Notch */}
       <div className="w-full pt-[max(calc(env(safe-area-inset-top,0px)+76px),88px)]" />
 

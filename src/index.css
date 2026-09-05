@@ -131,4 +131,40 @@ html, body {
   animation: clock-hour-wiggle 0.55s ease-in-out forwards;
 }
 
+/* Splash Screen Clock (1s cycle: 75% smooth stroke + 25% settle at resting position) */
+@keyframes splash-clock-minute {
+  0% {
+    transform: rotate(0deg);
+  }
+  75% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes splash-clock-hour {
+  0% {
+    transform: rotate(0deg);
+  }
+  37.5% {
+    transform: rotate(40deg);
+  }
+  75% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-splash-minute {
+  animation: splash-clock-minute 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-splash-hour {
+  animation: splash-clock-hour 1s ease-in-out infinite;
+}
+
 
