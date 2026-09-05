@@ -99,18 +99,18 @@ export const AnimatedClockPeriodic: React.FC<AnimatedClockPeriodicProps> = ({
         {/* Right ear/bell dome (from reference image) */}
         <path d="M15.8 5 A 3.5 3.5 0 0 1 20.2 8.8" strokeWidth="2" />
 
-        {/* Main circular clock face */}
-        <circle cx="12" cy="13" r="8" strokeWidth="2" />
+        {/* Main circular clock face with solid white background */}
+        <circle cx="12" cy="13" r="8" strokeWidth="2" fill="#FFFFFF" />
 
-        {/* Minute Hand: rotates 360 degrees (from lucide-animated clock) */}
+        {/* Minute Hand: rotates 360 degrees (from lucide-animated clock, always black) */}
         <line
           x1="12"
           y1="13"
           x2="12"
           y2="7.5"
           strokeWidth="2"
+          stroke="#000000"
           className={clsx(
-            'text-ios-text',
             isAnimating && 'animate-clock-minute'
           )}
           style={{
@@ -119,15 +119,15 @@ export const AnimatedClockPeriodic: React.FC<AnimatedClockPeriodicProps> = ({
           }}
         />
 
-        {/* Hour Hand: wiggles 40 degrees (from lucide-animated clock) */}
+        {/* Hour Hand: wiggles 40 degrees (from lucide-animated clock, always black) */}
         <line
           x1="12"
           y1="13"
           x2="15.8"
           y2="13"
           strokeWidth="2"
+          stroke="#000000"
           className={clsx(
-            'text-ios-text',
             isAnimating && 'animate-clock-hour'
           )}
           style={{
@@ -136,8 +136,8 @@ export const AnimatedClockPeriodic: React.FC<AnimatedClockPeriodicProps> = ({
           }}
         />
 
-        {/* Central pin dot */}
-        <circle cx="12" cy="13" r="1.1" fill="currentColor" className="text-ios-text" />
+        {/* Central pin dot (always black) */}
+        <circle cx="12" cy="13" r="1.1" fill="#000000" />
       </svg>
     </div>
   );

@@ -94,39 +94,41 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
             {/* Right ear/bell dome */}
             <path d="M15.8 5 A 3.5 3.5 0 0 1 20.2 8.8" strokeWidth="2" />
 
-            {/* Main circular clock face */}
-            <circle cx="12" cy="13" r="8" strokeWidth="2" />
+            {/* Main circular clock face with solid white background */}
+            <circle cx="12" cy="13" r="8" strokeWidth="2" fill="#FFFFFF" />
 
-            {/* Minute Hand: 360 degree spin */}
+            {/* Minute Hand: 360 degree spin (always black) */}
             <line
               x1="12"
               y1="13"
               x2="12"
               y2="7.5"
               strokeWidth="2"
-              className="text-ios-text animate-splash-minute"
+              stroke="#000000"
+              className="animate-splash-minute"
               style={{
                 transformOrigin: '12px 13px',
                 transformBox: 'view-box',
               }}
             />
 
-            {/* Hour Hand: 40 degree wiggle */}
+            {/* Hour Hand: 40 degree wiggle (always black) */}
             <line
               x1="12"
               y1="13"
               x2="15.8"
               y2="13"
               strokeWidth="2"
-              className="text-ios-text animate-splash-hour"
+              stroke="#000000"
+              className="animate-splash-hour"
               style={{
                 transformOrigin: '12px 13px',
                 transformBox: 'view-box',
               }}
             />
 
-            {/* Central pin dot */}
-            <circle cx="12" cy="13" r="1.1" fill="currentColor" className="text-ios-text" />
+            {/* Central pin dot (always black) */}
+            <circle cx="12" cy="13" r="1.1" fill="#000000" />
           </svg>
         </div>
       </div>

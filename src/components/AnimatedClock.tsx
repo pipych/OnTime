@@ -92,17 +92,17 @@ export const AnimatedClock: React.FC<AnimatedClockProps> = ({
         {/* Right ear/bell dome */}
         <path d="M15.8 5 A 3.5 3.5 0 0 1 20.2 8.8" strokeWidth="2" />
 
-        {/* Main circular clock face */}
-        <circle cx="12" cy="13" r="8" strokeWidth="2" />
+        {/* Main circular clock face with solid white background */}
+        <circle cx="12" cy="13" r="8" strokeWidth="2" fill="#FFFFFF" />
 
-        {/* Minute Hand: ticks forward in a circle every second */}
+        {/* Minute Hand: ticks forward in a circle every second (always black) */}
         <line
           x1="12"
           y1="13"
           x2="12"
           y2="7.5"
           strokeWidth="2"
-          className="text-ios-text"
+          stroke="#000000"
           style={{
             transform: `rotate(${minuteAngle}deg)`,
             transformOrigin: '12px 13px',
@@ -111,14 +111,14 @@ export const AnimatedClock: React.FC<AnimatedClockProps> = ({
           }}
         />
 
-        {/* Hour Hand: ticks forward in a circle synchronously */}
+        {/* Hour Hand: ticks forward in a circle synchronously (always black) */}
         <line
           x1="12"
           y1="13"
           x2="15.8"
           y2="13"
           strokeWidth="2"
-          className="text-ios-text"
+          stroke="#000000"
           style={{
             transform: `rotate(${hourAngle}deg)`,
             transformOrigin: '12px 13px',
@@ -127,8 +127,8 @@ export const AnimatedClock: React.FC<AnimatedClockProps> = ({
           }}
         />
 
-        {/* Central pin dot */}
-        <circle cx="12" cy="13" r="1.1" fill="currentColor" className="text-ios-text" />
+        {/* Central pin dot (always black) */}
+        <circle cx="12" cy="13" r="1.1" fill="#000000" />
       </svg>
     </div>
   );
