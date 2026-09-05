@@ -119,7 +119,6 @@ function AppContent() {
       )}
 
       {/* Safe Area Top Spacer for Telegram UI & Notch */}
-      <div className="fixed top-0 left-0 right-0 h-[max(calc(env(safe-area-inset-top,0px)+76px),88px)] bg-ios-bg z-30 pointer-events-none transition-colors duration-200" />
       <div className="w-full pt-[max(calc(env(safe-area-inset-top,0px)+76px),88px)]" />
 
       {/* Main Content Area */}

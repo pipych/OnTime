@@ -147,16 +147,26 @@ export const HomePage: React.FC<HomePageProps> = ({
       className="w-full max-w-lg mx-auto animate-fadeIn"
       style={{ minHeight: 'calc(100dvh + 280px)' }}
     >
-      {/* Sticky Top Navigation Bar (remains at top under Telegram notch) */}
-      <header className="sticky top-[max(calc(env(safe-area-inset-top,0px)+76px),88px)] z-35 w-full px-4 py-2 relative">
-        {/* Dynamic backdrop blur layer that smoothly reveals on scroll */}
+      {/* Fixed Top Navigation Bar - stays permanently visible when scrolling */}
+      <header className="fixed top-0 left-0 right-0 z-40 w-full pointer-events-none">
+        {/* Dissolving gradient background: soft fade downward, no flat stripe, no harsh border */}
         <div
           ref={headerBgRef}
-          className="absolute inset-0 bg-ios-bg/90 backdrop-blur-md border-b border-black/[0.05] dark:border-white/[0.05] shadow-sm pointer-events-none transition-opacity duration-150"
-          style={{ opacity: 0 }}
+          className="absolute inset-0 -bottom-10 pointer-events-none transition-opacity duration-200"
+          style={{
+            opacity: 0,
+            background:
+              'linear-gradient(to bottom, var(--ios-bg) 0%, var(--ios-bg) 62%, transparent 100%)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            maskImage:
+              'linear-gradient(to bottom, black 0%, black 60%, transparent 100%)',
+            WebkitMaskImage:
+              'linear-gradient(to bottom, black 0%, black 60%, transparent 100%)',
+          }}
         />
 
-        <div className="flex items-center justify-between h-11 relative z-10">
+        <div className="w-full max-w-lg mx-auto px-4 pt-[max(calc(env(safe-area-inset-top,0px)+76px),88px)] pb-3 flex items-center justify-between h-[max(calc(env(safe-area-inset-top,0px)+128px),140px)] relative z-10 pointer-events-auto">
           {/* Left group: Clock Anchor & smooth reappearing Title */}
           <div className="flex items-center gap-2.5">
             <div ref={anchorRef} className="w-8 h-8 relative flex-shrink-0">
@@ -191,8 +201,10 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </header>
 
-      {/* Main Page Body with generous top and inter-element spacing */}
-      <div className="px-4 pt-8 sm:pt-12 pb-56 space-y-8">
+      {/* Main Page Body: includes header space offset, then generous top and inter-element spacing */}
+      <div className="px-4 pt-10 sm:pt-14 pb-56 space-y-8">
+        {/* Spacer for fixed header row */}
+        <div className="w-full h-11 pointer-events-none" />
         {/* Centered Hero Section with large 96px icon and spacious top margin */}
         <div className="pt-2 pb-2 flex flex-col items-center text-center">
           {/* Spatial target placeholder: 96px by 96px with generous margin */}
