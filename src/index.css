@@ -15,6 +15,7 @@
   --ios-dock-border: transparent;
   --ios-item-bg: rgba(0, 0, 0, 0.03);
   --ios-item-hover: rgba(0, 0, 0, 0.06);
+  --ios-progress-track: #E5E5EA;
 
   color-scheme: light;
 }
@@ -32,6 +33,7 @@
   --ios-dock-border: transparent;
   --ios-item-bg: rgba(255, 255, 255, 0.04);
   --ios-item-hover: rgba(255, 255, 255, 0.08);
+  --ios-progress-track: #3A3A3C;
 
   color-scheme: dark;
 }
@@ -50,6 +52,7 @@
     --ios-dock-border: transparent;
     --ios-item-bg: rgba(255, 255, 255, 0.04);
     --ios-item-hover: rgba(255, 255, 255, 0.08);
+    --ios-progress-track: #3A3A3C;
 
     color-scheme: dark;
   }

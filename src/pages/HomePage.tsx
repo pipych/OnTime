@@ -379,7 +379,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
           {/* Progress bar under the category title with tight margin */}
           {totalCount > 0 && (
-            <div className="mt-3 w-full h-1.5 rounded-full bg-ios-item-bg overflow-hidden">
+            <div className="mt-3 w-full h-1.5 rounded-full bg-ios-progressTrack overflow-hidden">
               <div
                 className={clsx(
                   "h-full rounded-full transition-all duration-300",

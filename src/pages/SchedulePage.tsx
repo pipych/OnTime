@@ -351,7 +351,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
       {/* Progress bar directly under the calendar, without card or percentages, and without border */}
       {selectedTotalCount > 0 && (
         <div className="w-full px-1 -mt-1 mb-1">
-          <div className="w-full h-1.5 rounded-full bg-ios-cardSubtle overflow-hidden">
+          <div className="w-full h-1.5 rounded-full bg-ios-progressTrack overflow-hidden">
             <div
               className={clsx(
                 'h-full rounded-full transition-all duration-300 ease-out',

@@ -16,6 +16,7 @@ export default {
           text: "var(--ios-text)",
           textSecondary: "var(--ios-text-secondary)",
           accent: "var(--ios-accent)",
+          progressTrack: "var(--ios-progress-track)",
           green: "#34C759",
           greenDark: "#30D158",
           orange: "#FF9500",
