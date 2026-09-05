@@ -1,9 +1,14 @@
-import React, { useEffect, useLayoutEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef } from 'react';
+import clsx from 'clsx';
 import { SFSymbol } from '../components/SFSymbol';
 import { AnimatedClock } from '../components/AnimatedClock';
 import { useI18n } from '../context/I18nContext';
 import { getFirstName } from '../utils/name';
 import { CHARGE_DAYS_MAP, DEVICES } from '../constants/devices';
+import { getWeekId } from '../utils/date';
+import { getLocalCharges, toggleChargeGAS, chargeAllGAS } from '../services/api';
+import { triggerSideCannonsConfetti } from '../utils/confetti';
+import type { DeviceKey } from '../types';
 
 interface HomePageProps {
   userName?: string;
@@ -14,7 +19,7 @@ interface HomePageProps {
 export const HomePage: React.FC<HomePageProps> = ({
   userName,
   onNavigateToSchedule,
-  chargesCount,
+  chargesCount: _initialChargesCount,
 }) => {
   const { lang, t } = useI18n();
   const firstName = getFirstName(userName, lang);
@@ -25,6 +30,126 @@ export const HomePage: React.FC<HomePageProps> = ({
   const clockRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const headerBgRef = useRef<HTMLDivElement>(null);
+
+  // Today dates & week id
+  const today = useMemo(() => new Date(), []);
+  const dayOfWeek = today.getDay();
+  const weekId = useMemo(() => getWeekId(today), [today]);
+
+  // Local charges state synced with localStorage
+  const [charges, setCharges] = useState<Record<string, boolean>>(() => getLocalCharges(weekId));
+
+  // Auto-sync charges when returning to app or switching tabs
+  useEffect(() => {
+    const sync = () => {
+      const local = getLocalCharges(weekId);
+      if (local && Object.keys(local).length > 0) {
+        setCharges((prev) => ({ ...prev, ...local }));
+      }
+    };
+    window.addEventListener('focus', sync);
+    window.addEventListener('visibilitychange', sync);
+    return () => {
+      window.removeEventListener('focus', sync);
+      window.removeEventListener('visibilitychange', sync);
+    };
+  }, [weekId]);
+
+  // Sunday audit uncharged items calculation
+  const sundayUncharged = useMemo(() => {
+    if (dayOfWeek !== 0) return [];
+    const uncharged: DeviceKey[] = [];
+    for (let d = 1; d <= 6; d++) {
+      const items = CHARGE_DAYS_MAP[d] || [];
+      for (const item of items) {
+        if (!charges[`CHG_${weekId}_${item}`] && !uncharged.includes(item)) {
+          uncharged.push(item);
+        }
+      }
+    }
+    return uncharged;
+  }, [charges, dayOfWeek, weekId]);
+
+  // Items for today
+  const todayItems: { key: DeviceKey; isSundayDebt: boolean }[] = useMemo(() => {
+    const regular = (CHARGE_DAYS_MAP[dayOfWeek] || []).map((k) => ({
+      key: k,
+      isSundayDebt: false,
+    }));
+    if (dayOfWeek === 0 && sundayUncharged.length > 0) {
+      sundayUncharged.forEach((k) => {
+        if (!regular.some((r) => r.key === k)) {
+          regular.push({ key: k, isSundayDebt: true });
+        }
+      });
+    }
+    return regular;
+  }, [dayOfWeek, sundayUncharged]);
+
+  const totalCount = todayItems.length;
+  const chargedCount = todayItems.filter(
+    (i) => charges[`CHG_${weekId}_${i.key}`]
+  ).length;
+  const isAllCharged = totalCount > 0 && chargedCount === totalCount;
+
+  // Confetti trigger on 100% completion
+  const userInteractedRef = useRef<boolean>(false);
+  const prevAllChargedRef = useRef<boolean>(isAllCharged);
+
+  useEffect(() => {
+    if (userInteractedRef.current && !prevAllChargedRef.current && isAllCharged && totalCount > 0) {
+      triggerSideCannonsConfetti();
+      try {
+        window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
+      } catch (_) {}
+    }
+    prevAllChargedRef.current = isAllCharged;
+  }, [isAllCharged, totalCount]);
+
+  const handleToggleDevice = (deviceKey: DeviceKey) => {
+    userInteractedRef.current = true;
+    const fullKey = `CHG_${weekId}_${deviceKey}`;
+    const newStatus = !charges[fullKey];
+
+    setCharges((prev) => {
+      const updated = { ...prev };
+      if (newStatus) {
+        updated[fullKey] = true;
+      } else {
+        delete updated[fullKey];
+      }
+      return updated;
+    });
+
+    try {
+      if (newStatus) {
+        window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
+      } else {
+        window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('light');
+      }
+    } catch (_) {}
+
+    toggleChargeGAS(weekId, deviceKey, newStatus).catch(() => {});
+  };
+
+  const handleChargeAll = () => {
+    userInteractedRef.current = true;
+    const items = todayItems.map((i) => i.key);
+
+    setCharges((prev) => {
+      const updated = { ...prev };
+      items.forEach((k) => {
+        updated[`CHG_${weekId}_${k}`] = true;
+      });
+      return updated;
+    });
+
+    try {
+      window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
+    } catch (_) {}
+
+    chargeAllGAS(weekId, items).catch(() => {});
+  };
 
   // Initial estimate: 96px icon centered horizontally, ~110px below header
   const coordsRef = useRef({
@@ -137,11 +262,6 @@ export const HomePage: React.FC<HomePageProps> = ({
     };
   }, [calculateCoords, updateAnimation]);
 
-  // Today's scheduled devices
-  const today = new Date();
-  const dayOfWeek = today.getDay();
-  const todayKeys = CHARGE_DAYS_MAP[dayOfWeek] || [];
-
   return (
     <>
       {/* Fixed Top Navigation Bar - strictly outside any transformed container to lock to viewport */}
@@ -200,6 +320,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       >
         {/* Spacer for fixed header row */}
         <div className="w-full h-11 pointer-events-none" />
+
         {/* Centered Hero Section with large 96px icon and spacious top margin */}
         <div className="pt-2 pb-2 flex flex-col items-center text-center">
           {/* Spatial target placeholder: 96px by 96px with generous margin */}
@@ -214,94 +335,175 @@ export const HomePage: React.FC<HomePageProps> = ({
           </h2>
         </div>
 
-        {/* Quick Widget: Charges Today */}
-        <div
-          onClick={onNavigateToSchedule}
-          className="p-5 rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark cursor-pointer active:scale-[0.98] transition-all group"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3.5">
-              <div className="w-13 h-13 rounded-2xl bg-ios-accent/15 text-ios-accent flex items-center justify-center flex-shrink-0">
+        {/* Redesigned Today Charges Widget */}
+        <div className="rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark p-5 space-y-4 transition-all">
+          {/* Widget Header: Tab icon + Title "График зарядок" on left, chevron on right */}
+          <div
+            onClick={onNavigateToSchedule}
+            className="flex items-center justify-between cursor-pointer group select-none"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-ios-accent/15 text-ios-accent flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                 <SFSymbol
                   src="/symbols/SVG_Vector/01_charge_bolt.svg"
-                  className="w-7 h-7 text-ios-accent"
+                  className="w-5 h-5 text-ios-accent"
                 />
               </div>
               <div>
-                <h3 className="text-[17px] font-semibold text-ios-text group-hover:text-ios-accent transition-colors text-left">
+                <h3 className="text-[17px] font-semibold text-ios-text group-hover:text-ios-accent transition-colors leading-tight">
                   {t.chargesWidgetTitle}
                 </h3>
-                <p className="text-[13px] text-ios-textSecondary text-left">
-                  {chargesCount.total > 0
-                    ? t.chargesCountToday(chargesCount.charged, chargesCount.total)
+                <p className="text-[12px] text-ios-textSecondary mt-0.5">
+                  {totalCount > 0
+                    ? t.chargesCountToday(chargedCount, totalCount)
                     : t.checkDevices}
                 </p>
               </div>
             </div>
 
-            <SFSymbol
-              src="/symbols/SVG_Vector/15_back_chevron.svg"
-              className="w-5 h-5 text-ios-textSecondary rotate-180 group-hover:translate-x-0.5 transition-transform"
-            />
+            <button
+              type="button"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-ios-textSecondary group-hover:text-ios-text group-hover:translate-x-0.5 transition-all"
+              aria-label={t.tabSchedule}
+            >
+              <SFSymbol
+                src="/symbols/SVG_Vector/15_back_chevron.svg"
+                className="w-4 h-4 text-ios-textSecondary rotate-180"
+              />
+            </button>
           </div>
 
-          {/* Progress bar */}
-          {chargesCount.total > 0 && (
+          {/* Progress bar under the category title */}
+          {totalCount > 0 && (
             <div className="w-full h-1.5 rounded-full bg-ios-item-bg overflow-hidden">
               <div
-                className="h-full rounded-full bg-ios-accent transition-all duration-300"
+                className={clsx(
+                  "h-full rounded-full transition-all duration-300",
+                  isAllCharged ? "bg-ios-green" : "bg-ios-accent"
+                )}
                 style={{
-                  width: `${Math.round(
-                    (chargesCount.charged / chargesCount.total) * 100
-                  )}%`,
+                  width: `${Math.round((chargedCount / totalCount) * 100)}%`,
                 }}
               />
             </div>
           )}
-        </div>
 
-        {/* Today's Tasks Device Cards (provides genuine scrollable content and task preview) */}
-        {todayKeys.length > 0 && (
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between px-1">
-              <h3 className="text-[13px] font-semibold text-ios-textSecondary uppercase tracking-wider">
-                {lang === 'uk' ? 'Пристрої на сьогодні' : 'Устройства на сегодня'}
-              </h3>
-              <span className="text-[13px] font-medium text-ios-textSecondary">
-                {chargesCount.charged} / {chargesCount.total}
-              </span>
-            </div>
+          {/* Miniature version of the Device Checklist */}
+          {totalCount > 0 && (
+            <div className="divide-y divide-black/[0.04] dark:divide-white/[0.04] pt-1">
+              {todayItems.map(({ key, isSundayDebt }) => {
+                const device = DEVICES[key];
+                if (!device) return null;
+                const isCharged = !!charges[`CHG_${weekId}_${key}`];
+                const deviceName = lang === 'uk' ? device.nameUk : device.nameRu;
 
-            <div className="bg-ios-card rounded-ios shadow-ios-card dark:shadow-ios-card-dark divide-y divide-black/[0.04] dark:divide-white/[0.04] overflow-hidden">
-              {todayKeys.map((key) => {
-                const dev = DEVICES[key];
-                if (!dev) return null;
-                const name = lang === 'uk' ? dev.nameUk : dev.nameRu;
                 return (
                   <div
                     key={key}
-                    onClick={onNavigateToSchedule}
-                    className="flex items-center justify-between p-4 cursor-pointer active:bg-ios-item-hover transition-colors"
+                    onClick={() => handleToggleDevice(key)}
+                    className="py-2.5 px-1 flex items-center justify-between gap-3 cursor-pointer group/item active:opacity-75 transition-opacity"
                   >
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-10 h-10 rounded-xl bg-ios-item-bg flex items-center justify-center flex-shrink-0">
-                        <SFSymbol src={dev.symbolSvg} className="w-5 h-5 text-ios-accent" />
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-ios-item-bg flex items-center justify-center flex-shrink-0">
+                        <SFSymbol
+                          src={device.symbolSvg}
+                          fallbackPng={device.symbolPngWhite}
+                          className={clsx(
+                            "w-5 h-5 transition-colors",
+                            isCharged ? "text-ios-green" : isSundayDebt ? "text-ios-red" : "text-ios-text"
+                          )}
+                          alt={deviceName}
+                        />
                       </div>
-                      <div>
-                        <div className="text-[16px] font-medium text-ios-text">{name}</div>
-                        <div className="text-[12px] text-ios-textSecondary">{dev.category}</div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={clsx(
+                              "text-[14px] font-medium truncate tracking-tight",
+                              isCharged ? "text-ios-text line-through opacity-70" : "text-ios-text"
+                            )}
+                          >
+                            {deviceName}
+                          </span>
+                          {isSundayDebt && (
+                            <span className="text-[9px] font-semibold px-1 py-0.5 rounded bg-ios-red/20 text-ios-red">
+                              {t.debtBadge}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-ios-textSecondary">
+                          <span className={isCharged ? "text-ios-green font-medium" : "text-ios-textSecondary"}>
+                            {isCharged ? t.chargedStatus : t.pendingStatus}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <SFSymbol
-                      src="/symbols/SVG_Vector/15_back_chevron.svg"
-                      className="w-4 h-4 text-ios-textSecondary rotate-180 opacity-60"
-                    />
+
+                    {/* iOS Checkbox Button: Apple Reminders circle-in-circle style */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleDevice(key);
+                      }}
+                      className={clsx(
+                        "w-5.5 h-5.5 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0 border-2",
+                        isCharged
+                          ? "border-ios-green shadow-glow-green scale-105"
+                          : "border-black/20 dark:border-white/25 hover:border-ios-green/50 bg-transparent"
+                      )}
+                      aria-label={isCharged ? t.chargedStatus : t.pendingStatus}
+                    >
+                      <span
+                        className={clsx(
+                          "w-3 h-3 rounded-full bg-ios-green transition-all duration-200 ease-out",
+                          isCharged ? "scale-100 opacity-100" : "scale-0 opacity-0"
+                        )}
+                      />
+                    </button>
                   </div>
                 );
               })}
             </div>
-          </div>
-        )}
+          )}
+
+          {/* Action button: "Все заряжено" or Celebration state */}
+          {totalCount > 0 && !isAllCharged && (
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={handleChargeAll}
+                className="w-full py-3 rounded-2xl bg-ios-accent hover:opacity-90 active:scale-[0.98] text-white font-semibold text-[15px] shadow-glow-accent flex items-center justify-center gap-2 transition-all"
+              >
+                <SFSymbol
+                  src="/symbols/SVG_Vector/37_status_all_charged.svg"
+                  className="w-5 h-5 text-white"
+                />
+                <span>{t.allChargedBtn}</span>
+              </button>
+            </div>
+          )}
+
+          {/* Celebration status when all charged */}
+          {isAllCharged && totalCount > 0 && (
+            <div
+              onClick={() => {
+                triggerSideCannonsConfetti();
+                try {
+                  window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
+                } catch (_) {}
+              }}
+              className="py-3 px-4 rounded-2xl bg-ios-green/10 text-ios-green flex items-center justify-center gap-2 font-semibold text-[14px] cursor-pointer active:scale-[0.98] transition-all select-none"
+              title="🎉"
+            >
+              <SFSymbol
+                src="/symbols/SVG_Vector/41_battery_100.svg"
+                className="w-6 h-4 text-ios-green"
+              />
+              <span>{t.allChargedOnToday}</span>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );
