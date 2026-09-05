@@ -14,12 +14,16 @@ interface HomePageProps {
   userName?: string;
   onNavigateToSchedule: () => void;
   chargesCount: { charged: number; total: number };
+  onHapticImpact?: (style?: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void;
+  onHapticSuccess?: () => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
   userName,
   onNavigateToSchedule,
   chargesCount: _initialChargesCount,
+  onHapticImpact,
+  onHapticSuccess,
 }) => {
   const { lang, t } = useI18n();
   const firstName = getFirstName(userName, lang);
@@ -99,18 +103,21 @@ export const HomePage: React.FC<HomePageProps> = ({
   useEffect(() => {
     if (userInteractedRef.current && !prevAllChargedRef.current && isAllCharged && totalCount > 0) {
       triggerSideCannonsConfetti();
+      onHapticSuccess?.();
       try {
         window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
       } catch (_) {}
     }
     prevAllChargedRef.current = isAllCharged;
-  }, [isAllCharged, totalCount]);
+  }, [isAllCharged, totalCount, onHapticSuccess]);
 
   const handleToggleDevice = (deviceKey: DeviceKey) => {
     userInteractedRef.current = true;
+    onHapticImpact?.('medium');
     const fullKey = `CHG_${weekId}_${deviceKey}`;
     const newStatus = !charges[fullKey];
 
+    // Optimistic UI with clean deletion when unchecking
     setCharges((prev) => {
       const updated = { ...prev };
       if (newStatus) {
@@ -121,19 +128,27 @@ export const HomePage: React.FC<HomePageProps> = ({
       return updated;
     });
 
-    try {
-      if (newStatus) {
+    if (newStatus) {
+      onHapticSuccess?.();
+      try {
         window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
-      } else {
+      } catch (_) {}
+    } else {
+      try {
         window.Telegram?.WebApp?.HapticFeedback?.impactOccurred('light');
-      }
-    } catch (_) {}
+      } catch (_) {}
+    }
 
     toggleChargeGAS(weekId, deviceKey, newStatus).catch(() => {});
   };
 
   const handleChargeAll = () => {
     userInteractedRef.current = true;
+    onHapticSuccess?.();
+    try {
+      window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
+    } catch (_) {}
+
     const items = todayItems.map((i) => i.key);
 
     setCharges((prev) => {
@@ -143,10 +158,6 @@ export const HomePage: React.FC<HomePageProps> = ({
       });
       return updated;
     });
-
-    try {
-      window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
-    } catch (_) {}
 
     chargeAllGAS(weekId, items).catch(() => {});
   };
@@ -336,46 +347,39 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
 
         {/* Redesigned Today Charges Widget */}
-        <div className="rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark p-5 space-y-4 transition-all">
+        <div className="rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark p-5 transition-all">
           {/* Widget Header: Tab icon + Title "График зарядок" on left, chevron on right */}
           <div
             onClick={onNavigateToSchedule}
             className="flex items-center justify-between cursor-pointer group select-none"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-ios-accent/15 text-ios-accent flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-ios-accent/15 text-ios-accent flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                 <SFSymbol
                   src="/symbols/SVG_Vector/01_charge_bolt.svg"
-                  className="w-5 h-5 text-ios-accent"
+                  className="w-8 h-8 text-ios-accent"
                 />
               </div>
-              <div>
-                <h3 className="text-[17px] font-semibold text-ios-text group-hover:text-ios-accent transition-colors leading-tight">
-                  {t.chargesWidgetTitle}
-                </h3>
-                <p className="text-[12px] text-ios-textSecondary mt-0.5">
-                  {totalCount > 0
-                    ? t.chargesCountToday(chargedCount, totalCount)
-                    : t.checkDevices}
-                </p>
-              </div>
+              <h3 className="text-[18px] font-bold text-ios-text group-hover:text-ios-accent transition-colors leading-tight">
+                {t.chargesWidgetTitle}
+              </h3>
             </div>
 
             <button
               type="button"
-              className="w-8 h-8 rounded-full flex items-center justify-center text-ios-textSecondary group-hover:text-ios-text group-hover:translate-x-0.5 transition-all"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-ios-textSecondary group-hover:text-ios-text group-hover:translate-x-0.5 transition-all"
               aria-label={t.tabSchedule}
             >
               <SFSymbol
                 src="/symbols/SVG_Vector/15_back_chevron.svg"
-                className="w-4 h-4 text-ios-textSecondary rotate-180"
+                className="w-4.5 h-4.5 text-ios-textSecondary rotate-180"
               />
             </button>
           </div>
 
-          {/* Progress bar under the category title */}
+          {/* Progress bar under the category title with tight margin */}
           {totalCount > 0 && (
-            <div className="w-full h-1.5 rounded-full bg-ios-item-bg overflow-hidden">
+            <div className="mt-3 w-full h-1.5 rounded-full bg-ios-item-bg overflow-hidden">
               <div
                 className={clsx(
                   "h-full rounded-full transition-all duration-300",
@@ -388,9 +392,9 @@ export const HomePage: React.FC<HomePageProps> = ({
             </div>
           )}
 
-          {/* Miniature version of the Device Checklist */}
+          {/* Miniature version of the Device Checklist (clean, without subtitles, small gap) */}
           {totalCount > 0 && (
-            <div className="divide-y divide-black/[0.04] dark:divide-white/[0.04] pt-1">
+            <div className="mt-2 divide-y divide-black/[0.04] dark:divide-white/[0.04]">
               {todayItems.map(({ key, isSundayDebt }) => {
                 const device = DEVICES[key];
                 if (!device) return null;
@@ -401,7 +405,10 @@ export const HomePage: React.FC<HomePageProps> = ({
                   <div
                     key={key}
                     onClick={() => handleToggleDevice(key)}
-                    className="py-2.5 px-1 flex items-center justify-between gap-3 cursor-pointer group/item active:opacity-75 transition-opacity"
+                    className={clsx(
+                      "py-2.5 px-1 flex items-center justify-between gap-3 cursor-pointer group/item transition-all duration-200 active:scale-[0.98]",
+                      isCharged ? "opacity-75" : ""
+                    )}
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-8 h-8 rounded-lg bg-ios-item-bg flex items-center justify-center flex-shrink-0">
@@ -415,31 +422,24 @@ export const HomePage: React.FC<HomePageProps> = ({
                           alt={deviceName}
                         />
                       </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <span
-                            className={clsx(
-                              "text-[14px] font-medium truncate tracking-tight",
-                              isCharged ? "text-ios-text line-through opacity-70" : "text-ios-text"
-                            )}
-                          >
-                            {deviceName}
-                          </span>
-                          {isSundayDebt && (
-                            <span className="text-[9px] font-semibold px-1 py-0.5 rounded bg-ios-red/20 text-ios-red">
-                              {t.debtBadge}
-                            </span>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span
+                          className={clsx(
+                            "text-[15px] font-medium truncate tracking-tight transition-all",
+                            isCharged ? "text-ios-text line-through opacity-65" : "text-ios-text"
                           )}
-                        </div>
-                        <div className="text-[11px] text-ios-textSecondary">
-                          <span className={isCharged ? "text-ios-green font-medium" : "text-ios-textSecondary"}>
-                            {isCharged ? t.chargedStatus : t.pendingStatus}
+                        >
+                          {deviceName}
+                        </span>
+                        {isSundayDebt && (
+                          <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-ios-red/20 text-ios-red flex-shrink-0">
+                            {t.debtBadge}
                           </span>
-                        </div>
+                        )}
                       </div>
                     </div>
 
-                    {/* iOS Checkbox Button: Apple Reminders circle-in-circle style */}
+                    {/* iOS Checkbox Button: Apple Reminders circle-in-circle style (same as in full Schedule tab) */}
                     <button
                       type="button"
                       onClick={(e) => {
@@ -447,7 +447,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                         handleToggleDevice(key);
                       }}
                       className={clsx(
-                        "w-5.5 h-5.5 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0 border-2",
+                        "w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0 border-2",
                         isCharged
                           ? "border-ios-green shadow-glow-green scale-105"
                           : "border-black/20 dark:border-white/25 hover:border-ios-green/50 bg-transparent"
@@ -456,7 +456,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                     >
                       <span
                         className={clsx(
-                          "w-3 h-3 rounded-full bg-ios-green transition-all duration-200 ease-out",
+                          "w-3.5 h-3.5 rounded-full bg-ios-green transition-all duration-200 ease-out",
                           isCharged ? "scale-100 opacity-100" : "scale-0 opacity-0"
                         )}
                       />
@@ -469,7 +469,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
           {/* Action button: "Все заряжено" or Celebration state */}
           {totalCount > 0 && !isAllCharged && (
-            <div className="pt-2">
+            <div className="mt-3.5 pt-1">
               <button
                 type="button"
                 onClick={handleChargeAll}
@@ -489,11 +489,12 @@ export const HomePage: React.FC<HomePageProps> = ({
             <div
               onClick={() => {
                 triggerSideCannonsConfetti();
+                onHapticSuccess?.();
                 try {
                   window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred('success');
                 } catch (_) {}
               }}
-              className="py-3 px-4 rounded-2xl bg-ios-green/10 text-ios-green flex items-center justify-center gap-2 font-semibold text-[14px] cursor-pointer active:scale-[0.98] transition-all select-none"
+              className="mt-3.5 py-3 px-4 rounded-2xl bg-ios-green/10 text-ios-green flex items-center justify-center gap-2 font-semibold text-[14px] cursor-pointer active:scale-[0.98] transition-all select-none"
               title="🎉"
             >
               <SFSymbol

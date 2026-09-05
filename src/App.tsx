@@ -131,6 +131,8 @@ function AppContent() {
               setActiveTab('schedule');
             }}
             chargesCount={todayChargesCount}
+            onHapticImpact={hapticImpact}
+            onHapticSuccess={hapticSuccess}
           />
         )}
 
