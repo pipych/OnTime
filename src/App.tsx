@@ -15,7 +15,7 @@ import { SplashScreen } from './components/SplashScreen';
 function AppContent() {
   const { user, hapticImpact, hapticSuccess, hapticSelection } = useTelegram();
   const { lang, setLang } = useI18n();
-  const [activeTab, setActiveTab] = useState<TabType>('schedule');
+  const [activeTab, setActiveTab] = useState<TabType>('home');
   const [botUserName, setBotUserName] = useState<string>('');
   const [isDataReady, setIsDataReady] = useState<boolean>(false);
   const [isSplashDone, setIsSplashDone] = useState<boolean>(false);
