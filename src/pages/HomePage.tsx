@@ -327,11 +327,11 @@ export const HomePage: React.FC<HomePageProps> = ({
               onOpenSettings?.();
             }}
             aria-label="Settings"
-            className="w-11 h-11 rounded-full bg-ios-item-bg flex items-center justify-center text-ios-text active:scale-95 transition-transform shadow-sm flex-shrink-0"
+            className="w-8 h-8 flex items-center justify-center text-ios-text active:scale-90 active:opacity-60 transition-all flex-shrink-0"
           >
             <SFSymbol
               src="/symbols/SVG_Vector/11_settings_gear.svg"
-              className="w-6 h-6 text-ios-text"
+              className="w-8 h-8 text-ios-text"
             />
           </button>
         </div>
