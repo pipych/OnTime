@@ -115,8 +115,13 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
                 {day.shortName}
               </span>
 
-              {/* Day Number: white always */}
-              <span className="text-[17px] font-bold leading-none my-0.5 tracking-tight text-white">
+              {/* Day Number: white if selected, adaptive text-ios-text if unselected */}
+              <span
+                className={clsx(
+                  'text-[17px] font-bold leading-none my-0.5 tracking-tight transition-colors',
+                  isSelected ? 'text-white' : 'text-ios-text'
+                )}
+              >
                 {day.dayOfMonth}
               </span>
 
@@ -138,11 +143,11 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
                     )}
                   />
                 )}
-                {status === 'pending' && (
+                {(status === 'pending' || status === 'none') && (
                   <span
                     className={clsx(
-                      'w-1 h-1 rounded-full',
-                      isSelected ? 'bg-white/40' : 'bg-white/20'
+                      'w-1.5 h-1.5 rounded-full transition-colors',
+                      isSelected ? 'bg-white/50' : 'bg-black/30 dark:bg-white/30'
                     )}
                   />
                 )}
