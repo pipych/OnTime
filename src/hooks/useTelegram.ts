@@ -30,6 +30,17 @@ export function useTelegram() {
 
     try {
       tg.ready();
+      tg.expand();
+
+      // Telegram WebApp 7.7+ Fullscreen API
+      if (typeof tg.requestFullscreen === 'function') {
+        tg.requestFullscreen();
+      }
+
+      // Disable vertical swipe to prevent accidental exit
+      if (typeof tg.disableVerticalSwipes === 'function') {
+        tg.disableVerticalSwipes();
+      }
 
       // Sync color scheme
       const currentScheme = tg.colorScheme === 'light' ? 'light' : 'dark';
