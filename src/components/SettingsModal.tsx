@@ -141,7 +141,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           }}
         />
 
-        <div className="w-full max-w-lg mx-auto px-4 pt-[max(calc(env(safe-area-inset-top,0px)+26px),34px)] pb-3 flex items-center justify-center relative z-10 pointer-events-auto">
+        <div className="w-full max-w-lg mx-auto px-4 pt-[max(calc(env(safe-area-inset-top,0px)+44px),56px)] pb-3 flex items-center justify-center relative z-10 pointer-events-auto">
           {/* Centered title */}
           <h1 className="text-[20px] font-bold text-ios-text tracking-tight text-center">
             {t.settingsTitle}
@@ -150,7 +150,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       </header>
 
       {/* Main Settings Content */}
-      <div className="w-full max-w-lg mx-auto px-4 pt-[max(calc(env(safe-area-inset-top,0px)+82px),94px)] pb-32 space-y-6">
+      <div className="w-full max-w-lg mx-auto px-4 pt-[max(calc(env(safe-area-inset-top,0px)+104px),116px)] pb-32 space-y-6">
         {/* Category 1: Напоминания (Reminders) */}
         <div>
           <h2 className="text-[13px] font-semibold text-ios-textSecondary uppercase tracking-wider px-3 mb-2">
