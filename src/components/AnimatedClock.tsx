@@ -127,8 +127,8 @@ export const AnimatedClock: React.FC<AnimatedClockProps> = ({
           }}
         />
 
-        {/* Central pin dot (always black) */}
-        <circle cx="12" cy="13" r="1.1" fill="#000000" />
+        {/* Central pin dot (always solid black, no red stroke) */}
+        <circle cx="12" cy="13" r="1.1" fill="#000000" stroke="none" />
       </svg>
     </div>
   );
