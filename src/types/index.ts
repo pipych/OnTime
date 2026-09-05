@@ -41,6 +41,16 @@ export interface DayInfo {
 
 export type TabType = 'home' | 'schedule';
 
+export type ReminderTime = '18:05' | '20:05' | '20:35' | '21:05';
+
+export interface UserSettings {
+  sub_reminders: boolean;
+  reminder_time: ReminderTime;
+  sub_charge: boolean;
+  sub_gu: boolean;
+  sub_schedule: boolean;
+}
+
 export interface WeekChargesResponse {
   ok: boolean;
   week: string;

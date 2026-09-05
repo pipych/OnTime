@@ -1,12 +1,18 @@
 import { useState, useMemo, useEffect } from 'react';
 import './App.css';
 import { useTelegram } from './hooks/useTelegram';
-import type { TabType } from './types';
+import type { TabType, UserSettings } from './types';
 import { TabBar } from './components/TabBar';
 import { HomePage } from './pages/HomePage';
 import { SchedulePage } from './pages/SchedulePage';
+import { SettingsModal } from './components/SettingsModal';
 import { CHARGE_DAYS_MAP } from './constants/devices';
-import { getLocalCharges, fetchUserDataFromGAS, fetchWeeklyDataFromGAS } from './services/api';
+import {
+  getLocalCharges,
+  fetchUserDataFromGAS,
+  fetchWeeklyDataFromGAS,
+  getLocalUserSettings,
+} from './services/api';
 import { getWeekId } from './utils/date';
 import { I18nProvider, useI18n } from './context/I18nContext';
 import type { Language } from './constants/i18n';
@@ -19,6 +25,8 @@ function AppContent() {
   const [botUserName, setBotUserName] = useState<string>('');
   const [isDataReady, setIsDataReady] = useState<boolean>(false);
   const [isSplashDone, setIsSplashDone] = useState<boolean>(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [userSettings, setUserSettings] = useState<UserSettings>(() => getLocalUserSettings());
 
   // Initial data loading coordinator (user profile + weekly schedule & charges)
   useEffect(() => {
@@ -51,6 +59,9 @@ function AppContent() {
         }
         if (userRes.value.user_name) {
           setBotUserName(userRes.value.user_name);
+        }
+        if (userRes.value.settings) {
+          setUserSettings(userRes.value.settings as UserSettings);
         }
       }
 
@@ -133,6 +144,9 @@ function AppContent() {
             chargesCount={todayChargesCount}
             onHapticImpact={hapticImpact}
             onHapticSuccess={hapticSuccess}
+            onOpenSettings={() => {
+              setIsSettingsOpen(true);
+            }}
           />
         )}
 
@@ -152,6 +166,19 @@ function AppContent() {
           setActiveTab(tab);
         }}
         onHaptic={() => hapticSelection()}
+      />
+
+      {/* Full-screen iOS Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        userId={user?.id}
+        userName={userName}
+        initialSettings={userSettings}
+        onSettingsChange={(newSettings) => setUserSettings(newSettings)}
+        onHapticImpact={hapticImpact}
+        onHapticSuccess={hapticSuccess}
+        onHapticSelection={hapticSelection}
       />
     </div>
   );

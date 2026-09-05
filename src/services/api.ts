@@ -1,8 +1,40 @@
-import type { DeviceKey, WeekChargesResponse } from '../types';
+import type { DeviceKey, WeekChargesResponse, UserSettings, ReminderTime } from '../types';
 import { getWeekId } from '../utils/date';
 
 const LOCAL_STORAGE_KEY_PREFIX = 'vchasno_charges_';
+const LOCAL_STORAGE_SETTINGS_KEY = 'vchasno_user_settings_v1';
 const GAS_URL_KEY = 'vchasno_gas_url';
+
+export const DEFAULT_USER_SETTINGS: UserSettings = {
+  sub_reminders: false,
+  reminder_time: '20:35',
+  sub_charge: false,
+  sub_gu: false,
+  sub_schedule: false,
+};
+
+export function getLocalUserSettings(): UserSettings {
+  if (typeof window === 'undefined') return DEFAULT_USER_SETTINGS;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_SETTINGS_KEY);
+    if (raw) {
+      return { ...DEFAULT_USER_SETTINGS, ...JSON.parse(raw) };
+    }
+  } catch (_) {}
+  return DEFAULT_USER_SETTINGS;
+}
+
+export function saveLocalUserSettings(settings: Partial<UserSettings>): UserSettings {
+  if (typeof window === 'undefined') return DEFAULT_USER_SETTINGS;
+  try {
+    const current = getLocalUserSettings();
+    const updated: UserSettings = { ...current, ...settings };
+    localStorage.setItem(LOCAL_STORAGE_SETTINGS_KEY, JSON.stringify(updated));
+    return updated;
+  } catch (_) {
+    return DEFAULT_USER_SETTINGS;
+  }
+}
 
 export const DEFAULT_GAS_API_URL =
   'https://script.google.com/macros/s/AKfycby9jVlbmoAnf48T2nMd5a_RYZXGGo38sWYsDgUrUoSDp5Oku2drTK-59Udna76FWIhq/exec';
@@ -29,10 +61,12 @@ export interface UserDataResponse {
   lang?: 'ru' | 'uk';
   is_admin?: boolean;
   settings?: {
-    sub_exits?: string;
+    sub_reminders?: boolean | string;
     reminder_time?: string;
-    sub_gu?: string;
-    sub_schedule?: string;
+    sub_charge?: boolean | string;
+    sub_gu?: boolean | string;
+    sub_schedule?: boolean | string;
+    sub_exits?: string;
   };
   allowed_weeks?: string[];
   schedule?: Record<string, string> | null;
@@ -72,6 +106,29 @@ export async function fetchUserDataFromGAS(
           localStorage.setItem('vchasno_user_lang', data.lang);
         } catch (_) {}
       }
+      if (data.settings) {
+        const parsedSettings: UserSettings = {
+          sub_reminders:
+            data.settings.sub_reminders === true ||
+            data.settings.sub_reminders === 'true' ||
+            data.settings.sub_reminders === 'ON' ||
+            data.settings.sub_exits === 'ON',
+          reminder_time: (data.settings.reminder_time as ReminderTime) || '20:35',
+          sub_charge:
+            data.settings.sub_charge === true ||
+            data.settings.sub_charge === 'true' ||
+            data.settings.sub_charge === 'ON',
+          sub_gu:
+            data.settings.sub_gu === true ||
+            data.settings.sub_gu === 'true' ||
+            data.settings.sub_gu === 'ON',
+          sub_schedule:
+            data.settings.sub_schedule === true ||
+            data.settings.sub_schedule === 'true' ||
+            data.settings.sub_schedule === 'ON',
+        };
+        saveLocalUserSettings(parsedSettings);
+      }
       if (data.schedule) {
         saveLocalSchedule(getWeekId(), data.schedule);
       }
@@ -81,6 +138,56 @@ export async function fetchUserDataFromGAS(
     console.warn('Failed to fetch user data from GAS:', error);
   }
   return null;
+}
+
+/**
+ * Sync individual setting change to GAS bot
+ */
+export async function syncUserSettingToGAS(
+  userId?: number | string,
+  key?: keyof UserSettings,
+  value?: boolean | string
+): Promise<void> {
+  if (!userId || !key) return;
+  const gasUrl = getGasApiUrl();
+  if (!gasUrl) return;
+
+  try {
+    const targetUrl = new URL(gasUrl);
+    targetUrl.searchParams.set('action', 'set_user_setting');
+    targetUrl.searchParams.set('user_id', String(userId));
+    targetUrl.searchParams.set('key', key);
+    targetUrl.searchParams.set('value', String(value));
+    targetUrl.searchParams.set('_t', Date.now().toString());
+
+    await fetch(targetUrl.toString());
+  } catch (e) {
+    console.warn('Failed to sync user setting to GAS:', e);
+  }
+}
+
+/**
+ * Sync language preference to GAS bot
+ */
+export async function syncUserLangToGAS(
+  userId?: number | string,
+  lang?: 'uk' | 'ru'
+): Promise<void> {
+  if (!userId || !lang) return;
+  const gasUrl = getGasApiUrl();
+  if (!gasUrl) return;
+
+  try {
+    const targetUrl = new URL(gasUrl);
+    targetUrl.searchParams.set('action', 'set_user_lang');
+    targetUrl.searchParams.set('user_id', String(userId));
+    targetUrl.searchParams.set('lang', lang);
+    targetUrl.searchParams.set('_t', Date.now().toString());
+
+    await fetch(targetUrl.toString());
+  } catch (e) {
+    console.warn('Failed to sync user lang to GAS:', e);
+  }
 }
 
 const LOCAL_STORAGE_SCHED_PREFIX = 'vchasno_sched_';

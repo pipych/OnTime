@@ -34,6 +34,26 @@ export interface Translations {
   cleaningTitle: string;
   inDevelopment: string;
   defaultUserName: string;
+
+  // Settings
+  settingsTitle: string;
+  remindersCategory: string;
+  remindersShifts: string;
+  remindersShiftsDesc: string;
+  reminderTimeTitle: string;
+  reminderTimePrefix: string;
+  remindersCharges: string;
+  remindersChargesDesc: string;
+  remindersGU: string;
+  remindersGUDesc: string;
+  remindersSchedule: string;
+  remindersScheduleDesc: string;
+  appSettingsCategory: string;
+  appLanguage: string;
+  userProfile: string;
+  back: string;
+  done: string;
+  selectReminderTime: string;
 }
 
 export const TRANSLATIONS: Record<Language, Translations> = {
@@ -79,6 +99,26 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     cleaningTitle: 'Ген. уборка',
     inDevelopment: 'В разработке',
     defaultUserName: 'Коллега',
+
+    // Settings
+    settingsTitle: 'Настройки',
+    remindersCategory: 'Напоминания',
+    remindersShifts: 'Выходы',
+    remindersShiftsDesc: 'Напоминания об отправке выходов',
+    reminderTimeTitle: 'Время выходов',
+    reminderTimePrefix: 'Время:',
+    remindersCharges: 'Зарядка устройств',
+    remindersChargesDesc: 'Вечерняя проверка зарядок устройств',
+    remindersGU: 'Генеральная уборка',
+    remindersGUDesc: 'Напоминания о начале и фото ГУ',
+    remindersSchedule: 'График смен',
+    remindersScheduleDesc: 'Напоминание отправить график работы',
+    appSettingsCategory: 'Настройки приложения',
+    appLanguage: 'Язык',
+    userProfile: 'Пользователь',
+    back: 'Назад',
+    done: 'Готово',
+    selectReminderTime: 'Выберите время напоминания',
   },
 
   uk: {
@@ -123,5 +163,25 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     cleaningTitle: 'Ген. прибирання',
     inDevelopment: 'У розробці',
     defaultUserName: 'Колега',
+
+    // Settings
+    settingsTitle: 'Налаштування',
+    remindersCategory: 'Нагадування',
+    remindersShifts: 'Виходи',
+    remindersShiftsDesc: 'Нагадування про надсилання виходів',
+    reminderTimeTitle: 'Час виходів',
+    reminderTimePrefix: 'Час:',
+    remindersCharges: 'Зарядка пристроїв',
+    remindersChargesDesc: 'Вечірня перевірка зарядок пристроїв',
+    remindersGU: 'Генеральне прибирання',
+    remindersGUDesc: 'Нагадування про початок та фото ГУ',
+    remindersSchedule: 'Графік змін',
+    remindersScheduleDesc: 'Нагадування надіслати графік роботи',
+    appSettingsCategory: 'Налаштування застосунку',
+    appLanguage: 'Мова',
+    userProfile: 'Користувач',
+    back: 'Назад',
+    done: 'Готово',
+    selectReminderTime: 'Оберіть час нагадування',
   },
 };

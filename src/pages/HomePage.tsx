@@ -16,6 +16,7 @@ interface HomePageProps {
   chargesCount: { charged: number; total: number };
   onHapticImpact?: (style?: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void;
   onHapticSuccess?: () => void;
+  onOpenSettings?: () => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
@@ -24,6 +25,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   chargesCount: _initialChargesCount,
   onHapticImpact,
   onHapticSuccess,
+  onOpenSettings,
 }) => {
   const { lang, t } = useI18n();
   const firstName = getFirstName(userName, lang);
@@ -317,10 +319,21 @@ export const HomePage: React.FC<HomePageProps> = ({
             </h1>
           </div>
 
-          {/* Right group: User profile initial circle */}
-          <div className="w-11 h-11 rounded-full bg-ios-accent/15 flex items-center justify-center text-ios-accent font-bold text-[16px] shadow-sm flex-shrink-0">
-            {displayName.charAt(0).toUpperCase()}
-          </div>
+          {/* Right group: Settings button */}
+          <button
+            type="button"
+            onClick={() => {
+              onHapticImpact?.('light');
+              onOpenSettings?.();
+            }}
+            aria-label="Settings"
+            className="w-11 h-11 rounded-full bg-ios-item-bg flex items-center justify-center text-ios-text active:scale-95 transition-transform shadow-sm flex-shrink-0"
+          >
+            <SFSymbol
+              src="/symbols/SVG_Vector/11_settings_gear.svg"
+              className="w-6 h-6 text-ios-text"
+            />
+          </button>
         </div>
       </header>
 
