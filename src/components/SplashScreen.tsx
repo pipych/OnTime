@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 
 interface SplashScreenProps {
@@ -19,7 +19,7 @@ interface SplashScreenProps {
 export const SplashScreen: React.FC<SplashScreenProps> = ({
   isDataReady,
   onFinished,
-  size = 92,
+  size = 140,
 }) => {
   const [isDismissing, setIsDismissing] = useState(false);
   const [isUnmounted, setIsUnmounted] = useState(false);
@@ -62,7 +62,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
   return (
     <div
       className={clsx(
-        'fixed inset-0 z-50 flex items-center justify-center bg-ios-bg select-none transition-all duration-700 ease-in-out',
+        'fixed inset-0 z-[9999] flex items-center justify-center bg-ios-bg select-none transition-all duration-700 ease-in-out',
         isDismissing ? 'opacity-0 pointer-events-none scale-105' : 'opacity-100'
       )}
       aria-hidden={isDismissing}
