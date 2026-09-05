@@ -34,7 +34,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
   userId,
-  userName,
+  userName: _userName,
   initialSettings,
   onSettingsChange,
   onHapticImpact,
@@ -50,30 +50,47 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setSettings(initialSettings);
   }, [initialSettings]);
 
-  // Handle Telegram native BackButton
+  // Handle Telegram native BackButton and keyboard Escape
   React.useEffect(() => {
     if (!isOpen) return;
-    const tg = window.Telegram?.WebApp;
-    if (!tg?.BackButton) return;
 
-    try {
-      tg.BackButton.show();
-      const onBackClick = () => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
         if (isTimePickerOpen) {
           setIsTimePickerOpen(false);
         } else {
           onClose();
         }
-      };
-      tg.BackButton.onClick(onBackClick);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
 
-      return () => {
-        try {
-          tg.BackButton.offClick(onBackClick);
-          tg.BackButton.hide();
-        } catch (_) {}
-      };
-    } catch (_) {}
+    const tg = window.Telegram?.WebApp;
+    if (tg?.BackButton) {
+      try {
+        tg.BackButton.show();
+        const onBackClick = () => {
+          if (isTimePickerOpen) {
+            setIsTimePickerOpen(false);
+          } else {
+            onClose();
+          }
+        };
+        tg.BackButton.onClick(onBackClick);
+
+        return () => {
+          window.removeEventListener('keydown', handleKeyDown);
+          try {
+            tg.BackButton.offClick(onBackClick);
+            tg.BackButton.hide();
+          } catch (_) {}
+        };
+      } catch (_) {}
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isOpen, isTimePickerOpen, onClose]);
 
   if (!isOpen) return null;
@@ -124,46 +141,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           }}
         />
 
-        <div className="w-full max-w-lg mx-auto px-4 pt-[max(calc(env(safe-area-inset-top,0px)+12px),20px)] pb-3 flex items-center justify-between relative z-10 pointer-events-auto">
-          {/* Back button with chevron */}
-          <button
-            type="button"
-            onClick={() => {
-              onHapticImpact?.('light');
-              onClose();
-            }}
-            className="flex items-center gap-1 text-ios-accent active:opacity-60 transition-opacity py-1 px-1 -ml-2"
-          >
-            <SFSymbol
-              src="/symbols/SVG_Vector/15_back_chevron.svg"
-              className="w-5 h-5 text-ios-accent"
-            />
-            <span className="text-[17px] font-medium tracking-tight">
-              {t.back}
-            </span>
-          </button>
-
+        <div className="w-full max-w-lg mx-auto px-4 pt-[max(calc(env(safe-area-inset-top,0px)+26px),34px)] pb-3 flex items-center justify-center relative z-10 pointer-events-auto">
           {/* Centered title */}
-          <h1 className="text-[18px] font-bold text-ios-text tracking-tight">
+          <h1 className="text-[20px] font-bold text-ios-text tracking-tight text-center">
             {t.settingsTitle}
           </h1>
-
-          {/* Right: Done button */}
-          <button
-            type="button"
-            onClick={() => {
-              onHapticImpact?.('light');
-              onClose();
-            }}
-            className="text-ios-accent font-semibold text-[17px] active:opacity-60 transition-opacity py-1 px-2 -mr-2"
-          >
-            {t.done}
-          </button>
         </div>
       </header>
 
       {/* Main Settings Content */}
-      <div className="w-full max-w-lg mx-auto px-4 pt-[max(calc(env(safe-area-inset-top,0px)+72px),84px)] pb-32 space-y-6">
+      <div className="w-full max-w-lg mx-auto px-4 pt-[max(calc(env(safe-area-inset-top,0px)+82px),94px)] pb-32 space-y-6">
         {/* Category 1: Напоминания (Reminders) */}
         <div>
           <h2 className="text-[13px] font-semibold text-ios-textSecondary uppercase tracking-wider px-3 mb-2">
@@ -181,10 +168,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               className="py-3 px-4 flex items-center justify-between gap-3.5 cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] active:bg-black/[0.04] dark:active:bg-white/[0.04] transition-colors"
             >
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-9 h-9 rounded-xl bg-orange-500/15 text-orange-500 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 text-ios-accent">
                   <SFSymbol
                     src="/symbols/SVG_Vector/03_shifts_bell.svg"
-                    className="w-5 h-5 text-orange-500"
+                    className="w-7 h-7 text-ios-accent"
                   />
                 </div>
                 <div className="min-w-0">
@@ -223,10 +210,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {/* Row 2: Зарядка (Charges reminder) */}
             <div className="py-3 px-4 flex items-center justify-between gap-3.5">
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-9 h-9 rounded-xl bg-ios-accent/15 text-ios-accent flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 text-ios-accent">
                   <SFSymbol
                     src="/symbols/SVG_Vector/01_charge_bolt.svg"
-                    className="w-5 h-5 text-ios-accent"
+                    className="w-7 h-7 text-ios-accent"
                   />
                 </div>
                 <div className="min-w-0">
@@ -252,10 +239,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {/* Row 3: Генеральная уборка (GU) */}
             <div className="py-3 px-4 flex items-center justify-between gap-3.5">
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-9 h-9 rounded-xl bg-ios-green/15 text-ios-green flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 text-ios-accent">
                   <SFSymbol
                     src="/symbols/SVG_Vector/05_cleaning_soap_bubbles.svg"
-                    className="w-5 h-5 text-ios-green"
+                    className="w-7 h-7 text-ios-accent"
                   />
                 </div>
                 <div className="min-w-0">
@@ -281,10 +268,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {/* Row 4: График работы (Schedule reminder) */}
             <div className="py-3 px-4 flex items-center justify-between gap-3.5">
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-9 h-9 rounded-xl bg-purple-500/15 text-purple-500 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 text-ios-accent">
                   <SFSymbol
                     src="/symbols/SVG_Vector/07_schedule_calendar.svg"
-                    className="w-5 h-5 text-purple-500"
+                    className="w-7 h-7 text-ios-accent"
                   />
                 </div>
                 <div className="min-w-0">
@@ -315,14 +302,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {t.appSettingsCategory}
           </h2>
 
-          <div className="rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark overflow-hidden p-0 divide-y divide-black/[0.04] dark:divide-white/[0.04]">
+          <div className="rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark overflow-hidden p-0">
             {/* Row 1: Язык интерфейса */}
             <div className="py-3 px-4 flex items-center justify-between gap-3.5">
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-500 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 text-ios-accent">
                   <SFSymbol
                     src="/symbols/SVG_Vector/09_language_globe.svg"
-                    className="w-5 h-5 text-blue-500"
+                    className="w-7 h-7 text-ios-accent"
                   />
                 </div>
                 <span className="text-[16px] font-semibold text-ios-text tracking-tight">
@@ -356,28 +343,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 >
                   RU
                 </button>
-              </div>
-            </div>
-
-            {/* Row 2: Профиль пользователя */}
-            <div className="py-3 px-4 flex items-center justify-between gap-3.5">
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-9 h-9 rounded-xl bg-ios-item-bg text-ios-textSecondary flex items-center justify-center flex-shrink-0">
-                  <SFSymbol
-                    src="/symbols/SVG_Vector/34_admin_user_profile.svg"
-                    className="w-5 h-5 text-ios-textSecondary"
-                  />
-                </div>
-                <div className="min-w-0">
-                  <span className="text-[16px] font-semibold text-ios-text tracking-tight block truncate">
-                    {userName || t.userProfile}
-                  </span>
-                  {userId && (
-                    <span className="text-[12px] text-ios-textSecondary font-mono mt-0.5 block">
-                      ID: {userId}
-                    </span>
-                  )}
-                </div>
               </div>
             </div>
           </div>
