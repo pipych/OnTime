@@ -101,3 +101,34 @@ html, body {
   -webkit-mask-position: center;
 }
 
+/* Animated Clock (Lucide Animated Clock mechanism) */
+@keyframes clock-minute-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes clock-hour-wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(40deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-clock-minute {
+  animation: clock-minute-spin 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-clock-hour {
+  animation: clock-hour-wiggle 0.55s ease-in-out forwards;
+}
+
+

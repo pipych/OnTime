@@ -1,5 +1,6 @@
 import React from 'react';
 import { SFSymbol } from '../components/SFSymbol';
+import { AnimatedClock } from '../components/AnimatedClock';
 import { useI18n } from '../context/I18nContext';
 import { getFirstName } from '../utils/name';
 
@@ -22,9 +23,12 @@ export const HomePage: React.FC<HomePageProps> = ({
     <div className="w-full max-w-lg mx-auto px-4 pt-4 pb-36 space-y-5 animate-fadeIn">
       {/* Top Welcome Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-[32px] font-bold text-ios-text tracking-tight">
-          {t.appTitle}
-        </h1>
+        <div className="flex items-center gap-2.5">
+          <AnimatedClock className="w-8 h-8 text-ios-red flex-shrink-0" />
+          <h1 className="text-[32px] font-bold text-ios-text tracking-tight leading-none">
+            {t.appTitle}
+          </h1>
+        </div>
 
         <div className="w-11 h-11 rounded-full bg-ios-accent/15 flex items-center justify-center text-ios-accent font-bold text-[16px] shadow-sm">
           {displayName.charAt(0).toUpperCase()}
