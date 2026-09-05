@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
-import clsx from 'clsx';
+import React, { useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import { SFSymbol } from '../components/SFSymbol';
 import { AnimatedClock } from '../components/AnimatedClock';
 import { useI18n } from '../context/I18nContext';
 import { getFirstName } from '../utils/name';
+import { CHARGE_DAYS_MAP, DEVICES } from '../constants/devices';
 
 interface HomePageProps {
   userName?: string;
@@ -20,17 +20,55 @@ export const HomePage: React.FC<HomePageProps> = ({
   const firstName = getFirstName(userName, lang);
   const displayName = firstName || t.defaultUserName;
 
-  const [isScrolled, setIsScrolled] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
   const heroTargetRef = useRef<HTMLDivElement>(null);
+  const clockRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const headerBgRef = useRef<HTMLDivElement>(null);
 
-  // Initial estimate so it renders centered immediately on first frame before measurement
-  const [coords, setCoords] = useState(() => {
-    if (typeof window === 'undefined') return { x: 160, y: 64, scale: 2.25 };
-    const screenW = Math.min(window.innerWidth, 512);
-    const dx = screenW / 2 - 32;
-    return { x: dx, y: 64, scale: 2.25 };
+  // Initial estimate: 96px icon centered horizontally, ~110px below header
+  const coordsRef = useRef({
+    x: typeof window !== 'undefined' ? Math.min(window.innerWidth, 512) / 2 - 32 : 160,
+    y: 110,
+    scale: 3.0,
   });
+
+  // Smooth continuous animation driver based on scroll position
+  const updateAnimation = useCallback(() => {
+    const scrollY =
+      window.scrollY ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      window.pageYOffset ||
+      0;
+
+    // Transition completes within ~85px of scroll
+    const threshold = 85;
+    const p = Math.min(1, Math.max(0, scrollY / threshold));
+
+    const { x: dx, y: dy, scale } = coordsRef.current;
+
+    // Silk smoothstep curve: 3p^2 - 2p^3
+    const ease = p * p * (3 - 2 * p);
+
+    const curX = dx * (1 - ease);
+    const curY = dy * (1 - ease);
+    const curScale = 1 + (scale - 1) * (1 - ease);
+
+    if (clockRef.current) {
+      clockRef.current.style.transform = `translate3d(${curX.toFixed(2)}px, ${curY.toFixed(2)}px, 0) scale(${curScale.toFixed(3)})`;
+    }
+
+    if (titleRef.current) {
+      titleRef.current.style.opacity = ease.toFixed(3);
+      titleRef.current.style.transform = `translateX(${(-12 * (1 - ease)).toFixed(2)}px) scale(${(0.94 + 0.06 * ease).toFixed(3)})`;
+      titleRef.current.style.pointerEvents = ease > 0.5 ? 'auto' : 'none';
+    }
+
+    if (headerBgRef.current) {
+      headerBgRef.current.style.opacity = ease.toFixed(3);
+    }
+  }, []);
 
   const calculateCoords = useCallback(() => {
     if (!anchorRef.current || !heroTargetRef.current) return;
@@ -39,7 +77,12 @@ export const HomePage: React.FC<HomePageProps> = ({
 
     const anchorRect = anchor.getBoundingClientRect();
     const heroRect = hero.getBoundingClientRect();
-    const currentScroll = window.scrollY || document.documentElement.scrollTop || 0;
+    const scrollY =
+      window.scrollY ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      window.pageYOffset ||
+      0;
 
     const anchorCenterX = anchorRect.left + anchorRect.width / 2;
     const heroCenterX = heroRect.left + heroRect.width / 2;
@@ -47,12 +90,15 @@ export const HomePage: React.FC<HomePageProps> = ({
 
     const anchorCenterY = anchorRect.top + anchorRect.height / 2;
     const heroCenterY = heroRect.top + heroRect.height / 2;
-    const dy = (heroCenterY + currentScroll) - anchorCenterY;
+    // Current scroll offset restores the original resting document Y
+    const dy = (heroCenterY + scrollY) - anchorCenterY;
 
-    const scale = (heroRect.width || 72) / (anchorRect.width || 32);
+    const scale = (heroRect.width || 96) / (anchorRect.width || 32);
 
-    setCoords({ x: dx, y: dy, scale });
-  }, []);
+    coordsRef.current = { x: dx, y: dy, scale: scale || 3.0 };
+
+    updateAnimation();
+  }, [updateAnimation]);
 
   useLayoutEffect(() => {
     calculateCoords();
@@ -61,54 +107,64 @@ export const HomePage: React.FC<HomePageProps> = ({
   useEffect(() => {
     calculateCoords();
     const rafId = requestAnimationFrame(calculateCoords);
-    const timer = setTimeout(calculateCoords, 100);
+    const t1 = setTimeout(calculateCoords, 60);
+    const t2 = setTimeout(calculateCoords, 180);
 
-    const handleScroll = () => {
-      const y = window.scrollY || document.documentElement.scrollTop || 0;
-      setIsScrolled((prev) => {
-        if (!prev && y > 14) return true;
-        if (prev && y <= 4) return false;
-        return prev;
-      });
+    let scrollRaf: number | null = null;
+    const onScroll = () => {
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = requestAnimationFrame(updateAnimation);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
+    document.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('touchmove', onScroll, { passive: true });
     window.addEventListener('resize', calculateCoords);
     window.addEventListener('orientationchange', calculateCoords);
 
-    handleScroll();
+    onScroll();
 
     return () => {
       cancelAnimationFrame(rafId);
-      clearTimeout(timer);
-      window.removeEventListener('scroll', handleScroll);
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener('scroll', onScroll);
+      document.removeEventListener('scroll', onScroll);
+      window.removeEventListener('touchmove', onScroll);
       window.removeEventListener('resize', calculateCoords);
       window.removeEventListener('orientationchange', calculateCoords);
     };
-  }, [calculateCoords]);
+  }, [calculateCoords, updateAnimation]);
+
+  // Today's scheduled devices
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const todayKeys = CHARGE_DAYS_MAP[dayOfWeek] || [];
 
   return (
-    <div className="w-full max-w-lg mx-auto min-h-[calc(100dvh+120px)] animate-fadeIn">
-      {/* Sticky Top Navigation Bar */}
-      <header
-        className={clsx(
-          "sticky top-[max(calc(env(safe-area-inset-top,0px)+76px),88px)] z-35",
-          "w-full px-4 py-2 transition-all duration-300",
-          isScrolled
-            ? "bg-ios-bg/90 backdrop-blur-md border-b border-black/[0.05] dark:border-white/[0.05] shadow-sm"
-            : "bg-transparent border-b border-transparent"
-        )}
-      >
-        <div className="flex items-center justify-between h-11 relative">
+    <div
+      className="w-full max-w-lg mx-auto animate-fadeIn"
+      style={{ minHeight: 'calc(100dvh + 280px)' }}
+    >
+      {/* Sticky Top Navigation Bar (remains at top under Telegram notch) */}
+      <header className="sticky top-[max(calc(env(safe-area-inset-top,0px)+76px),88px)] z-35 w-full px-4 py-2 relative">
+        {/* Dynamic backdrop blur layer that smoothly reveals on scroll */}
+        <div
+          ref={headerBgRef}
+          className="absolute inset-0 bg-ios-bg/90 backdrop-blur-md border-b border-black/[0.05] dark:border-white/[0.05] shadow-sm pointer-events-none transition-opacity duration-150"
+          style={{ opacity: 0 }}
+        />
+
+        <div className="flex items-center justify-between h-11 relative z-10">
           {/* Left group: Clock Anchor & smooth reappearing Title */}
           <div className="flex items-center gap-2.5">
             <div ref={anchorRef} className="w-8 h-8 relative flex-shrink-0">
               <div
-                className="w-8 h-8 origin-center transition-transform duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none"
+                ref={clockRef}
+                className="w-8 h-8 origin-center pointer-events-none transition-transform duration-75 ease-out"
                 style={{
-                  transform: isScrolled
-                    ? 'translate3d(0, 0, 0) scale(1)'
-                    : `translate3d(${coords.x}px, ${coords.y}px, 0) scale(${coords.scale})`,
+                  transform: `translate3d(${coordsRef.current.x}px, ${coordsRef.current.y}px, 0) scale(${coordsRef.current.scale})`,
                 }}
               >
                 <AnimatedClock className="w-8 h-8 text-ios-red" />
@@ -116,13 +172,13 @@ export const HomePage: React.FC<HomePageProps> = ({
             </div>
 
             <h1
-              className={clsx(
-                "text-[28px] sm:text-[32px] font-bold text-ios-text tracking-tight leading-none",
-                "transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] origin-left",
-                isScrolled
-                  ? "opacity-100 translate-x-0 scale-100"
-                  : "opacity-0 -translate-x-3 scale-95 pointer-events-none"
-              )}
+              ref={titleRef}
+              className="text-[28px] sm:text-[32px] font-bold text-ios-text tracking-tight leading-none origin-left transition-all duration-100 ease-out"
+              style={{
+                opacity: 0,
+                transform: 'translateX(-12px) scale(0.94)',
+                pointerEvents: 'none',
+              }}
             >
               {t.appTitle}
             </h1>
@@ -135,16 +191,18 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </header>
 
-      {/* Main Page Body */}
-      <div className="px-4 pt-2 pb-36 space-y-5">
-        {/* Centered Greeting Section */}
-        <div className="pt-1 pb-2 space-y-3 flex flex-col items-center text-center">
-          {/* Spatial target placeholder where the large clock docks when unscrolled */}
+      {/* Main Page Body with generous top and inter-element spacing */}
+      <div className="px-4 pt-8 sm:pt-12 pb-56 space-y-8">
+        {/* Centered Hero Section with large 96px icon and spacious top margin */}
+        <div className="pt-2 pb-2 flex flex-col items-center text-center">
+          {/* Spatial target placeholder: 96px by 96px with generous margin */}
           <div
             ref={heroTargetRef}
-            className="w-[72px] h-[72px] flex items-center justify-center pointer-events-none"
+            className="w-24 h-24 flex items-center justify-center pointer-events-none"
           />
-          <h2 className="text-[28px] sm:text-[32px] font-bold text-ios-text tracking-tight leading-[1.18] max-w-sm">
+
+          {/* Greeting text with increased top margin from the icon */}
+          <h2 className="mt-5 sm:mt-6 text-[28px] sm:text-[32px] font-bold text-ios-text tracking-tight leading-[1.18] max-w-sm">
             {t.todayTasksGreeting(displayName)}
           </h2>
         </div>
@@ -194,6 +252,49 @@ export const HomePage: React.FC<HomePageProps> = ({
             </div>
           )}
         </div>
+
+        {/* Today's Tasks Device Cards (provides genuine scrollable content and task preview) */}
+        {todayKeys.length > 0 && (
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between px-1">
+              <h3 className="text-[13px] font-semibold text-ios-textSecondary uppercase tracking-wider">
+                {lang === 'uk' ? 'Пристрої на сьогодні' : 'Устройства на сегодня'}
+              </h3>
+              <span className="text-[13px] font-medium text-ios-textSecondary">
+                {chargesCount.charged} / {chargesCount.total}
+              </span>
+            </div>
+
+            <div className="bg-ios-card rounded-ios shadow-ios-card dark:shadow-ios-card-dark divide-y divide-black/[0.04] dark:divide-white/[0.04] overflow-hidden">
+              {todayKeys.map((key) => {
+                const dev = DEVICES[key];
+                if (!dev) return null;
+                const name = lang === 'uk' ? dev.nameUk : dev.nameRu;
+                return (
+                  <div
+                    key={key}
+                    onClick={onNavigateToSchedule}
+                    className="flex items-center justify-between p-4 cursor-pointer active:bg-ios-item-hover transition-colors"
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-ios-item-bg flex items-center justify-center flex-shrink-0">
+                        <SFSymbol src={dev.symbolSvg} className="w-5 h-5 text-ios-accent" />
+                      </div>
+                      <div>
+                        <div className="text-[16px] font-medium text-ios-text">{name}</div>
+                        <div className="text-[12px] text-ios-textSecondary">{dev.category}</div>
+                      </div>
+                    </div>
+                    <SFSymbol
+                      src="/symbols/SVG_Vector/15_back_chevron.svg"
+                      className="w-4 h-4 text-ios-textSecondary rotate-180 opacity-60"
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
