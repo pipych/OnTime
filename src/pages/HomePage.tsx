@@ -143,26 +143,18 @@ export const HomePage: React.FC<HomePageProps> = ({
   const todayKeys = CHARGE_DAYS_MAP[dayOfWeek] || [];
 
   return (
-    <div
-      className="w-full max-w-lg mx-auto animate-fadeIn"
-      style={{ minHeight: 'calc(100dvh + 280px)' }}
-    >
-      {/* Fixed Top Navigation Bar - stays permanently visible when scrolling */}
+    <>
+      {/* Fixed Top Navigation Bar - strictly outside any transformed container to lock to viewport */}
       <header className="fixed top-0 left-0 right-0 z-40 w-full pointer-events-none">
         {/* Dissolving gradient background: soft fade downward, no flat stripe, no harsh border */}
         <div
           ref={headerBgRef}
-          className="absolute inset-0 -bottom-10 pointer-events-none transition-opacity duration-200"
+          className="absolute inset-0 pointer-events-none transition-opacity duration-200"
           style={{
             opacity: 0,
             background:
-              'linear-gradient(to bottom, var(--ios-bg) 0%, var(--ios-bg) 62%, transparent 100%)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            maskImage:
-              'linear-gradient(to bottom, black 0%, black 60%, transparent 100%)',
-            WebkitMaskImage:
-              'linear-gradient(to bottom, black 0%, black 60%, transparent 100%)',
+              'linear-gradient(to bottom, var(--ios-bg) 0%, var(--ios-bg) 65%, transparent 100%)',
+            height: 'calc(100% + 32px)',
           }}
         />
 
@@ -201,8 +193,11 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </header>
 
-      {/* Main Page Body: includes header space offset, then generous top and inter-element spacing */}
-      <div className="px-4 pt-10 sm:pt-14 pb-56 space-y-8">
+      {/* Main Page Body: scrollable content with animation ONLY on the content, NOT on fixed header */}
+      <div
+        className="w-full max-w-lg mx-auto animate-fadeIn px-4 pt-10 sm:pt-14 pb-56 space-y-8"
+        style={{ minHeight: 'calc(100dvh + 280px)' }}
+      >
         {/* Spacer for fixed header row */}
         <div className="w-full h-11 pointer-events-none" />
         {/* Centered Hero Section with large 96px icon and spacious top margin */}
@@ -308,6 +303,6 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };
