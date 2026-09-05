@@ -26,6 +26,7 @@ export interface Translations {
   systemActive: string;
   welcomeGreeting: (name: string) => string;
   welcomeDesc: string;
+  todayTasksGreeting: (name: string) => string;
   chargesWidgetTitle: string;
   chargesCountToday: (charged: number, total: number) => string;
   checkDevices: string;
@@ -70,6 +71,7 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     systemActive: 'Система активна',
     welcomeGreeting: (name: string) => `Привет, ${name}! 👋`,
     welcomeDesc: 'Здесь скоро появятся быстрые действия, статистика смен и отчёты. Сейчас доступен календарный график зарядок устройств.',
+    todayTasksGreeting: (name: string) => `Привет, ${name}! Вот список задач на сегодня:`,
     chargesWidgetTitle: 'Зарядки',
     chargesCountToday: (charged: number, total: number) => `Сегодня заряжено ${charged} из ${total}`,
     checkDevices: 'Проверить устройства',
@@ -113,6 +115,7 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     systemActive: 'Система активна',
     welcomeGreeting: (name: string) => `Привіт, ${name}! 👋`,
     welcomeDesc: 'Тут незабаром з\'являться швидкі дії, статистика змін та звіти. Зараз доступний календарний графік зарядок пристроїв.',
+    todayTasksGreeting: (name: string) => `Привіт, ${name}! Ось список завдань на сьогодні:`,
     chargesWidgetTitle: 'Зарядки',
     chargesCountToday: (charged: number, total: number) => `Сьогодні заряджено ${charged} з ${total}`,
     checkDevices: 'Перевірити пристрої',

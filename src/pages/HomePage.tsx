@@ -35,25 +35,15 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </div>
 
-      {/* Hero Welcome Card with unclipped shadow */}
-      <div className="rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark relative">
-        <div className="p-5 relative z-10 space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-ios-green/15 text-ios-green text-[12px] font-semibold">
-            <span className="w-2 h-2 rounded-full bg-ios-green animate-pulse" />
-            <span>{t.systemActive}</span>
-          </div>
-          <h2 className="text-[20px] font-bold text-ios-text tracking-tight">
-            {t.welcomeGreeting(displayName)}
-          </h2>
-          <p className="text-[14px] text-ios-textSecondary leading-relaxed">
-            {t.welcomeDesc}
-          </p>
-        </div>
-
-        {/* Ambient background glow inside clipped overlay */}
-        <div className="absolute inset-0 rounded-ios overflow-hidden pointer-events-none">
-          <div className="absolute -right-8 -bottom-8 w-36 h-36 bg-ios-accent/10 rounded-full blur-2xl" />
-        </div>
+      {/* Greeting section without card */}
+      <div className="pt-2 pb-1 space-y-3">
+        <SFSymbol
+          src="/symbols/SVG_Vector/42_hand_wave.svg"
+          className="w-14 h-14 sm:w-16 sm:h-16 text-ios-textSecondary"
+        />
+        <h2 className="text-[28px] sm:text-[32px] font-bold text-ios-text tracking-tight leading-[1.18]">
+          {t.todayTasksGreeting(displayName)}
+        </h2>
       </div>
 
       {/* Quick Widget: Charges Today */}
@@ -100,35 +90,6 @@ export const HomePage: React.FC<HomePageProps> = ({
             />
           </div>
         )}
-      </div>
-
-      {/* Future placeholders in clean iOS style */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="p-4 rounded-ios bg-ios-cardSubtle opacity-70">
-          <div className="w-10 h-10 rounded-xl bg-ios-item-bg flex items-center justify-center mb-2.5 text-ios-textSecondary">
-            <SFSymbol
-              src="/symbols/SVG_Vector/03_shifts_bell.svg"
-              className="w-5 h-5"
-            />
-          </div>
-          <span className="text-[13px] font-semibold text-ios-text block">
-            {t.shiftsTitle}
-          </span>
-          <span className="text-[11px] text-ios-textSecondary">{t.inDevelopment}</span>
-        </div>
-
-        <div className="p-4 rounded-ios bg-ios-cardSubtle opacity-70">
-          <div className="w-10 h-10 rounded-xl bg-ios-item-bg flex items-center justify-center mb-2.5 text-ios-textSecondary">
-            <SFSymbol
-              src="/symbols/SVG_Vector/05_cleaning_soap_bubbles.svg"
-              className="w-5 h-5"
-            />
-          </div>
-          <span className="text-[13px] font-semibold text-ios-text block">
-            {t.cleaningTitle}
-          </span>
-          <span className="text-[11px] text-ios-textSecondary">{t.inDevelopment}</span>
-        </div>
       </div>
     </div>
   );
