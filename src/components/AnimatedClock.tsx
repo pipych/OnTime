@@ -90,25 +90,21 @@ export const AnimatedClock: React.FC<AnimatedClockProps> = ({
         xmlns="http://www.w3.org/2000/svg"
       >
         {/* Top button stem and rounded button cap (from reference image) */}
-        <line x1="12" y1="5.5" x2="12" y2="3.2" strokeWidth="2" strokeLinecap="round" />
+        <line x1="12" y1="6" x2="12" y2="3.2" strokeWidth="2" strokeLinecap="round" />
         <line x1="9.5" y1="2.2" x2="14.5" y2="2.2" strokeWidth="2.5" strokeLinecap="round" />
 
-        {/* Left ear/bell dome (seamlessly attached to circle without any gap) */}
+        {/* Left ear/bell dome (prominent dome seamlessly fused to circle stroke) */}
         <path
-          d="M 5.1 9.0 A 2.6 2.6 0 0 1 8.0 6.1 A 8 8 0 0 0 5.1 9.0 Z"
-          fill="currentColor"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinejoin="round"
+          d="M 4.8 9.8 C 1.8 6.8, 4.2 3.0, 7.8 6.3"
+          strokeWidth="2"
+          strokeLinecap="round"
         />
 
-        {/* Right ear/bell dome (seamlessly attached to circle without any gap) */}
+        {/* Right ear/bell dome (prominent dome seamlessly fused to circle stroke) */}
         <path
-          d="M 16.0 6.1 A 2.6 2.6 0 0 1 18.9 9.0 A 8 8 0 0 0 16.0 6.1 Z"
-          fill="currentColor"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinejoin="round"
+          d="M 19.2 9.8 C 22.2 6.8, 19.8 3.0, 16.2 6.3"
+          strokeWidth="2"
+          strokeLinecap="round"
         />
 
         {/* Main circular clock face */}
