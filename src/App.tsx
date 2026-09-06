@@ -180,6 +180,7 @@ function AppContent() {
             userId={user?.id}
             userName={userName}
             onHapticImpact={hapticImpact}
+            onHapticSuccess={hapticSuccess}
             onHapticSelection={hapticSelection}
           />
         )}

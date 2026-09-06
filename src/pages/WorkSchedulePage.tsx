@@ -14,11 +14,13 @@ import {
   fetchWeeklyDataFromGAS,
   getLocalSchedule,
 } from '../services/api';
+import { ScheduleEditorModal } from '../components/ScheduleEditorModal';
 
 interface WorkSchedulePageProps {
   userId?: number | string;
   userName?: string;
   onHapticImpact?: (style?: 'light' | 'medium' | 'heavy') => void;
+  onHapticSuccess?: () => void;
   onHapticSelection?: () => void;
 }
 
@@ -69,9 +71,15 @@ function getShiftForDay(schedule: Record<string, string> | null, dayOfWeek: numb
 }
 
 export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
+  userId,
+  userName,
   onHapticImpact,
+  onHapticSuccess,
 }) => {
   const { lang, t } = useI18n();
+
+  // Schedule editor modal visibility
+  const [isEditorOpen, setIsEditorOpen] = useState<boolean>(false);
 
   // Current active date reference
   const [referenceDate, setReferenceDate] = useState<Date>(() => new Date());
@@ -257,6 +265,47 @@ export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
           {t.scheduleEmptyWeek}
         </div>
       )}
+
+      {/* Floating Action Button (FAB) to create / edit schedule (Admin only) */}
+      <div className="fixed right-5 bottom-[max(calc(env(safe-area-inset-bottom,0px)+96px),108px)] z-40">
+        <button
+          type="button"
+          onClick={() => {
+            onHapticImpact?.('medium');
+            setIsEditorOpen(true);
+          }}
+          className="w-14 h-14 rounded-full bg-ios-accent text-white shadow-glow-accent flex items-center justify-center active:scale-90 hover:scale-105 transition-all duration-200 cursor-pointer"
+          aria-label={t.createScheduleTitle}
+        >
+          <svg
+            className="w-7 h-7"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2.5}
+            strokeLinecap="round"
+          >
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Schedule Editor Modal */}
+      <ScheduleEditorModal
+        isOpen={isEditorOpen}
+        onClose={() => setIsEditorOpen(false)}
+        currentWeekSchedule={currentSchedule || getLocalSchedule(getWeekId(new Date()))}
+        userId={userId}
+        userName={userName}
+        onSaved={(savedWeekId, newSchedule) => {
+          setSchedules((prev) => ({
+            ...prev,
+            [savedWeekId]: newSchedule,
+          }));
+        }}
+        onHapticImpact={onHapticImpact}
+        onHapticSuccess={onHapticSuccess}
+      />
     </div>
   );
 };

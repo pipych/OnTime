@@ -57,6 +57,16 @@ export interface Translations {
   back: string;
   done: string;
   selectReminderTime: string;
+
+  // Schedule Editor
+  createScheduleTitle: string;
+  saveBtn: string;
+  cancelBtn: string;
+  employeePlaceholder: string;
+  resetToTemplate: string;
+  savingStatus: string;
+  savedSuccess: string;
+  swapHint: string;
 }
 
 export const TRANSLATIONS: Record<Language, Translations> = {
@@ -125,6 +135,16 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     back: 'Назад',
     done: 'Готово',
     selectReminderTime: 'Выберите время напоминания',
+
+    // Schedule Editor
+    createScheduleTitle: 'Новый график',
+    saveBtn: 'Сохранить',
+    cancelBtn: 'Отмена',
+    employeePlaceholder: 'Имя сотрудника...',
+    resetToTemplate: 'Шаблон с текущей недели',
+    savingStatus: 'Сохранение...',
+    savedSuccess: 'График сохранен',
+    swapHint: 'Нажмите, чтобы поменять местами',
   },
 
   uk: {
@@ -192,5 +212,15 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     back: 'Назад',
     done: 'Готово',
     selectReminderTime: 'Оберіть час нагадування',
+
+    // Schedule Editor
+    createScheduleTitle: 'Новий графік',
+    saveBtn: 'Зберегти',
+    cancelBtn: 'Скасувати',
+    employeePlaceholder: "Ім'я працівника...",
+    resetToTemplate: 'Шаблон з поточного тижня',
+    savingStatus: 'Збереження...',
+    savedSuccess: 'Графік збережено',
+    swapHint: 'Натисніть, щоб поміняти місцями',
   },
 };

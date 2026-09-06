@@ -384,3 +384,54 @@ export async function chargeAllGAS(
     console.warn('Failed to sync charge_all to GAS:', e);
   }
 }
+
+/**
+ * Save schedule for a week to GAS and local storage
+ */
+export async function saveScheduleGAS(
+  weekId: string,
+  schedule: Record<string, string>,
+  userId?: number | string,
+  userName?: string
+): Promise<boolean> {
+  // 1. Optimistically save to local cache
+  saveLocalSchedule(weekId, schedule);
+
+  // 2. Sync to GAS Web App
+  const gasUrl = getGasApiUrl();
+  if (!gasUrl) return true;
+
+  try {
+    const targetUrl = new URL(gasUrl);
+    targetUrl.searchParams.set('action', 'set_schedule');
+    targetUrl.searchParams.set('week', weekId);
+    targetUrl.searchParams.set('data', JSON.stringify(schedule));
+    if (userId) targetUrl.searchParams.set('user_id', String(userId));
+    if (userName) targetUrl.searchParams.set('user_name', userName);
+    targetUrl.searchParams.set('_t', Date.now().toString());
+
+    const res = await fetch(targetUrl.toString(), {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    if (!res.ok) {
+      console.warn('GAS set_schedule HTTP status:', res.status);
+      return false;
+    }
+
+    const data = await res.json();
+    if (data && data.ok) {
+      if (data.schedule) {
+        saveLocalSchedule(weekId, data.schedule);
+      }
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.warn('Failed to save schedule to GAS:', e);
+    return false;
+  }
+}
