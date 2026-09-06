@@ -8,12 +8,14 @@ interface TabBarProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
   onHaptic?: () => void;
+  isAdmin?: boolean;
 }
 
 export const TabBar: React.FC<TabBarProps> = ({
   activeTab,
   onTabChange,
   onHaptic,
+  isAdmin = false,
 }) => {
   const { t } = useI18n();
 
@@ -30,6 +32,14 @@ export const TabBar: React.FC<TabBarProps> = ({
     },
   ];
 
+  if (isAdmin) {
+    tabs.push({
+      id: 'work_schedule',
+      label: t.tabWorkSchedule,
+      icon: '/symbols/SVG_Vector/07_schedule_calendar.svg',
+    });
+  }
+
   const handleSelect = (tab: TabType) => {
     if (tab !== activeTab) {
       onHaptic?.();
@@ -37,7 +47,15 @@ export const TabBar: React.FC<TabBarProps> = ({
     }
   };
 
-  const isSchedule = activeTab === 'schedule';
+  const isThreeTabs = tabs.length === 3;
+  const activeIndex = Math.max(
+    0,
+    tabs.findIndex((tab) => tab.id === activeTab)
+  );
+
+  const tabWidth = isThreeTabs ? 92 : 112;
+  const tabGap = 8;
+  const translateX = activeIndex * (tabWidth + tabGap);
 
   return (
     <>
@@ -56,9 +74,10 @@ export const TabBar: React.FC<TabBarProps> = ({
         <nav className="relative pointer-events-auto flex items-center p-2 rounded-full backdrop-blur-2xl bg-[var(--ios-dock-bg)] shadow-ios-dock dark:shadow-ios-dock-dark transition-all duration-300">
           {/* Animated tumbler sliding indicator pill */}
           <div
-            className="absolute top-2 left-2 w-28 bottom-2 rounded-full bg-ios-accent shadow-glow-accent pointer-events-none z-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform"
+            className="absolute top-2 left-2 bottom-2 rounded-full bg-ios-accent shadow-glow-accent pointer-events-none z-0 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform"
             style={{
-              transform: isSchedule ? 'translate3d(120px, 0, 0)' : 'translate3d(0, 0, 0)',
+              width: `${tabWidth}px`,
+              transform: `translate3d(${translateX}px, 0, 0)`,
             }}
           />
 
@@ -69,7 +88,8 @@ export const TabBar: React.FC<TabBarProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => handleSelect(tab.id)}
-                  className="flex flex-col items-center justify-center w-28 py-2.5 px-3 rounded-full transition-transform duration-200 ease-out font-medium active:scale-95"
+                  style={{ width: `${tabWidth}px` }}
+                  className="flex flex-col items-center justify-center py-2.5 px-2 rounded-full transition-transform duration-200 ease-out font-medium active:scale-95 cursor-pointer"
                 >
                   <SFSymbol
                     src={tab.icon}
@@ -81,7 +101,7 @@ export const TabBar: React.FC<TabBarProps> = ({
                   />
                   <span
                     className={clsx(
-                      'text-[11.5px] font-semibold tracking-tight leading-tight transition-colors duration-250',
+                      'text-[11.5px] font-semibold tracking-tight leading-tight transition-colors duration-250 whitespace-nowrap',
                       isActive ? 'text-white' : 'text-ios-textSecondary'
                     )}
                   >

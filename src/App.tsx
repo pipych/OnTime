@@ -5,6 +5,7 @@ import type { TabType, UserSettings } from './types';
 import { TabBar } from './components/TabBar';
 import { HomePage } from './pages/HomePage';
 import { SchedulePage } from './pages/SchedulePage';
+import { WorkSchedulePage } from './pages/WorkSchedulePage';
 import { SettingsModal } from './components/SettingsModal';
 import { CHARGE_DAYS_MAP } from './constants/devices';
 import {
@@ -23,6 +24,9 @@ function AppContent() {
   const { lang, setLang } = useI18n();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [botUserName, setBotUserName] = useState<string>('');
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => {
+    return user?.id === 654479769 || String(user?.id) === '654479769';
+  });
   const [isDataReady, setIsDataReady] = useState<boolean>(false);
   const [isSplashDone, setIsSplashDone] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
@@ -60,6 +64,9 @@ function AppContent() {
         if (userRes.value.user_name) {
           setBotUserName(userRes.value.user_name);
         }
+        if (userRes.value.is_admin !== undefined) {
+          setIsAdmin(Boolean(userRes.value.is_admin) || user?.id === 654479769 || String(user?.id) === '654479769');
+        }
         if (userRes.value.settings) {
           setUserSettings(userRes.value.settings as UserSettings);
         }
@@ -74,6 +81,13 @@ function AppContent() {
       window.clearTimeout(safetyTimer);
     };
   }, [user?.id, user?.first_name, user?.last_name, user?.username, user?.language_code, setLang]);
+
+  // Safety fallback if non-admin tries to enter work_schedule tab
+  useEffect(() => {
+    if (activeTab === 'work_schedule' && !isAdmin) {
+      setActiveTab('home');
+    }
+  }, [activeTab, isAdmin]);
 
 
   // Today charges summary for Home Page widget
@@ -160,6 +174,15 @@ function AppContent() {
             onHapticSelection={hapticSelection}
           />
         )}
+
+        {activeTab === 'work_schedule' && isAdmin && (
+          <WorkSchedulePage
+            userId={user?.id}
+            userName={userName}
+            onHapticImpact={hapticImpact}
+            onHapticSelection={hapticSelection}
+          />
+        )}
       </main>
 
       {/* Floating Bottom TabBar Dock */}
@@ -169,6 +192,7 @@ function AppContent() {
           setActiveTab(tab);
         }}
         onHaptic={() => hapticSelection()}
+        isAdmin={isAdmin}
       />
 
       {/* Full-screen iOS Settings Modal */}

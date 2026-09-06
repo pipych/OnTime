@@ -5,6 +5,9 @@ export interface Translations {
   appTitle: string;
   tabHome: string;
   tabSchedule: string;
+  tabWorkSchedule: string;
+  noShiftScheduled: string;
+  scheduleEmptyWeek: string;
   prevWeek: string;
   nextWeek: string;
 
@@ -61,6 +64,9 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     appTitle: 'Вчасно',
     tabHome: 'Главная',
     tabSchedule: 'Зарядки',
+    tabWorkSchedule: 'График',
+    noShiftScheduled: 'Выходной',
+    scheduleEmptyWeek: 'График на эту неделю ещё не загружен',
     prevWeek: 'Предыдущая неделя',
     nextWeek: 'Следующая неделя',
 
@@ -125,6 +131,9 @@ export const TRANSLATIONS: Record<Language, Translations> = {
     appTitle: 'Вчасно',
     tabHome: 'Головна',
     tabSchedule: 'Зарядки',
+    tabWorkSchedule: 'Графік',
+    noShiftScheduled: 'Вихідний',
+    scheduleEmptyWeek: 'Графік на цей тиждень ще не завантажено',
     prevWeek: 'Попередній тиждень',
     nextWeek: 'Наступний тиждень',
 

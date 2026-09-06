@@ -39,7 +39,7 @@ export interface DayInfo {
   deviceKeys: DeviceKey[];
 }
 
-export type TabType = 'home' | 'schedule';
+export type TabType = 'home' | 'schedule' | 'work_schedule';
 
 export type ReminderTime = '18:05' | '20:05' | '20:35' | '21:05';
 
