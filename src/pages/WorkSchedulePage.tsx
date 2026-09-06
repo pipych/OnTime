@@ -210,43 +210,45 @@ export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
       </div>
 
       {/* Week Schedule List Card */}
-      <div className="bg-ios-card rounded-[22px] border border-black/[0.06] dark:border-white/[0.08] shadow-sm overflow-hidden divide-y divide-black/10 dark:divide-white/10">
-        {weekDays.map((day) => {
-          const rawShift = getShiftForDay(currentSchedule, day.dayOfWeek);
-          const formattedShift = formatScheduleEmployeeName(rawShift, lang);
-          const dateLabel = `${String(day.date.getDate()).padStart(2, '0')}.${String(day.date.getMonth() + 1).padStart(2, '0')}`;
+      <div className="rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark p-4 sm:p-5 transition-all">
+        <div className="divide-y divide-black/[0.05] dark:divide-white/[0.05]">
+          {weekDays.map((day) => {
+            const rawShift = getShiftForDay(currentSchedule, day.dayOfWeek);
+            const formattedShift = formatScheduleEmployeeName(rawShift, lang);
+            const dateLabel = `${String(day.date.getDate()).padStart(2, '0')}.${String(day.date.getMonth() + 1).padStart(2, '0')}`;
 
-          return (
-            <div
-              key={day.isoDate}
-              className={clsx(
-                "flex items-center justify-between py-2.5 px-3.5 sm:px-4 transition-colors gap-3",
-                day.isToday && "bg-ios-accent/[0.06] dark:bg-ios-accent/[0.10]"
-              )}
-            >
-              {/* Left: Short Day of Week in red + Employee Name right beside it */}
-              <div className="flex items-baseline gap-2 min-w-0">
-                <span className="text-[16px] sm:text-[16.5px] font-bold text-ios-red leading-snug w-[28px] shrink-0">
-                  {day.shortName}
-                </span>
-                {formattedShift ? (
-                  <span className="text-[16.5px] sm:text-[17px] font-semibold text-ios-text leading-snug truncate">
-                    {formattedShift}
-                  </span>
-                ) : (
-                  <span className="text-[15px] sm:text-[15.5px] italic text-ios-textSecondary leading-snug">
-                    {t.noShiftScheduled}
-                  </span>
+            return (
+              <div
+                key={day.isoDate}
+                className={clsx(
+                  "py-3 px-2 flex items-center justify-between transition-colors gap-3 rounded-xl",
+                  day.isToday && "bg-ios-accent/[0.06] dark:bg-ios-accent/[0.10] px-2.5"
                 )}
-              </div>
+              >
+                {/* Left: Short Day of Week in red + Employee Name right beside it */}
+                <div className="flex items-baseline gap-2.5 min-w-0">
+                  <span className="text-[16px] sm:text-[16.5px] font-bold text-ios-red leading-snug w-[28px] shrink-0">
+                    {day.shortName}
+                  </span>
+                  {formattedShift ? (
+                    <span className="text-[16.5px] sm:text-[17px] font-semibold text-ios-text leading-snug truncate">
+                      {formattedShift}
+                    </span>
+                  ) : (
+                    <span className="text-[15px] sm:text-[15.5px] italic text-ios-textSecondary leading-snug">
+                      {t.noShiftScheduled}
+                    </span>
+                  )}
+                </div>
 
-              {/* Right: Date number */}
-              <span className="text-[13px] sm:text-[13.5px] font-medium text-ios-textSecondary leading-none shrink-0 text-right tabular-nums">
-                {dateLabel}
-              </span>
-            </div>
-          );
-        })}
+                {/* Right: Date number */}
+                <span className="text-[13px] sm:text-[13.5px] font-medium text-ios-textSecondary leading-none shrink-0 text-right tabular-nums">
+                  {dateLabel}
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Helper Note when week is completely empty */}
