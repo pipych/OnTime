@@ -161,13 +161,13 @@ export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
       {/* Top Header: Week Range (e.g. 07.09 — 13.09) + Week Navigation Buttons */}
       <div className="flex items-center justify-between">
         <div className="flex items-baseline gap-1.5 xs:gap-2">
-          <span className="text-[28px] xs:text-[32px] sm:text-[36px] font-black text-ios-text tracking-tight leading-none">
+          <span className="text-[30px] xs:text-[34px] sm:text-[38px] font-black text-ios-text tracking-tight leading-none">
             {startStr}
           </span>
-          <span className="text-[24px] xs:text-[28px] sm:text-[32px] font-bold text-ios-red tracking-tight leading-none">
+          <span className="text-[26px] xs:text-[30px] sm:text-[34px] font-bold text-ios-text tracking-tight leading-none">
             —
           </span>
-          <span className="text-[28px] xs:text-[32px] sm:text-[36px] font-black text-ios-text tracking-tight leading-none">
+          <span className="text-[30px] xs:text-[34px] sm:text-[38px] font-black text-ios-text tracking-tight leading-none">
             {endStr}
           </span>
         </div>
@@ -220,39 +220,30 @@ export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
             <div
               key={day.isoDate}
               className={clsx(
-                "flex items-center justify-between py-3.5 px-4 transition-colors",
+                "flex flex-col py-3 px-4 transition-colors",
                 day.isToday && "bg-ios-accent/[0.06] dark:bg-ios-accent/[0.10]"
               )}
             >
-              {/* Left Column: Day of week in red + Date below */}
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="text-[17px] font-bold text-ios-red leading-tight">
-                    {day.fullName}
-                  </span>
-                  {day.isToday && (
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-ios-accent/15 text-ios-accent">
-                      {lang === 'uk' ? 'Сьогодні' : 'Сегодня'}
-                    </span>
-                  )}
-                </div>
-                <span className="text-[13px] font-medium text-ios-textSecondary mt-0.5 leading-tight">
-                  {dateLabel}
+              {/* Row 1: Short Day of Week in red + Employee Name right beside it */}
+              <div className="flex items-baseline gap-2.5">
+                <span className="text-[20px] sm:text-[21px] font-bold text-ios-red leading-tight w-8 shrink-0">
+                  {day.shortName}
                 </span>
-              </div>
-
-              {/* Right Column: Employee Name or Off Status */}
-              <div className="text-right pl-3">
                 {formattedShift ? (
-                  <span className="text-[16px] font-semibold text-ios-text leading-tight block">
+                  <span className="text-[18px] sm:text-[19px] font-semibold text-ios-text leading-tight truncate">
                     {formattedShift}
                   </span>
                 ) : (
-                  <span className="text-[14px] italic text-ios-textSecondary leading-tight block">
+                  <span className="text-[16px] sm:text-[17px] italic text-ios-textSecondary leading-tight">
                     {t.noShiftScheduled}
                   </span>
                 )}
               </div>
+
+              {/* Row 2: Date number below */}
+              <span className="text-[14px] font-medium text-ios-textSecondary mt-0.5 leading-tight">
+                {dateLabel}
+              </span>
             </div>
           );
         })}
