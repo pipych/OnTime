@@ -210,7 +210,7 @@ export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
       </div>
 
       {/* Week Schedule List Card */}
-      <div className="bg-ios-card rounded-[22px] border border-[var(--ios-border)] shadow-sm overflow-hidden divide-y divide-[var(--ios-border)]">
+      <div className="bg-ios-card rounded-[22px] border border-black/[0.06] dark:border-white/[0.08] shadow-sm overflow-hidden divide-y divide-black/10 dark:divide-white/10">
         {weekDays.map((day) => {
           const rawShift = getShiftForDay(currentSchedule, day.dayOfWeek);
           const formattedShift = formatScheduleEmployeeName(rawShift, lang);
@@ -220,7 +220,7 @@ export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
             <div
               key={day.isoDate}
               className={clsx(
-                "flex flex-col py-3 px-4 transition-colors",
+                "flex flex-col py-3.5 px-4 transition-colors",
                 day.isToday && "bg-ios-accent/[0.06] dark:bg-ios-accent/[0.10]"
               )}
             >
