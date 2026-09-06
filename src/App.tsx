@@ -136,6 +136,7 @@ function AppContent() {
       <main className="flex-1 w-full flex flex-col">
         {activeTab === 'home' && (
           <HomePage
+            userId={user?.id}
             userName={userName}
             onNavigateToSchedule={() => {
               hapticImpact('medium');
@@ -152,6 +153,8 @@ function AppContent() {
 
         {activeTab === 'schedule' && (
           <SchedulePage
+            userId={user?.id}
+            userName={userName}
             onHapticImpact={hapticImpact}
             onHapticSuccess={hapticSuccess}
             onHapticSelection={hapticSelection}

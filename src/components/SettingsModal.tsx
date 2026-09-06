@@ -34,7 +34,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
   userId,
-  userName: _userName,
+  userName,
   initialSettings,
   onSettingsChange,
   onHapticImpact,
@@ -101,7 +101,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setSettings(updated);
     saveLocalUserSettings(updated);
     onSettingsChange?.(updated);
-    syncUserSettingToGAS(userId, key, nextVal);
+    syncUserSettingToGAS(userId, key, nextVal, userName);
   };
 
   const handleSelectTime = (time: ReminderTime) => {
@@ -115,7 +115,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     saveLocalUserSettings(updated);
     onSettingsChange?.(updated);
     setIsTimePickerOpen(false);
-    syncUserSettingToGAS(userId, 'reminder_time', time);
+    syncUserSettingToGAS(userId, 'reminder_time', time, userName);
   };
 
   const handleChangeLang = (newLang: Language) => {
@@ -125,7 +125,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
     } catch (_) {}
     setLang(newLang);
-    syncUserLangToGAS(userId, newLang);
+    syncUserLangToGAS(userId, newLang, userName);
   };
 
   return (

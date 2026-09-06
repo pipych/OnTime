@@ -23,12 +23,16 @@ import {
 } from '../services/api';
 
 interface SchedulePageProps {
+  userId?: number | string;
+  userName?: string;
   onHapticImpact?: (style?: 'light' | 'medium' | 'heavy') => void;
   onHapticSuccess?: () => void;
   onHapticSelection?: () => void;
 }
 
 export const SchedulePage: React.FC<SchedulePageProps> = ({
+  userId,
+  userName,
   onHapticImpact,
   onHapticSuccess,
   onHapticSelection,
@@ -235,7 +239,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     }
 
     // Sync to GAS & localStorage in background
-    toggleChargeGAS(currentWeekId, deviceKey, newStatus).catch(() => {});
+    toggleChargeGAS(currentWeekId, deviceKey, newStatus, userId, userName).catch(() => {});
   };
 
   // Charge all items for current day
@@ -253,7 +257,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
       return updated;
     });
 
-    chargeAllGAS(currentWeekId, items).catch(() => {});
+    chargeAllGAS(currentWeekId, items, userId, userName).catch(() => {});
   };
 
   // Week slide animation direction

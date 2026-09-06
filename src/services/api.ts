@@ -146,7 +146,8 @@ export async function fetchUserDataFromGAS(
 export async function syncUserSettingToGAS(
   userId?: number | string,
   key?: keyof UserSettings,
-  value?: boolean | string
+  value?: boolean | string,
+  userName?: string
 ): Promise<void> {
   if (!userId || !key) return;
   const gasUrl = getGasApiUrl();
@@ -156,6 +157,7 @@ export async function syncUserSettingToGAS(
     const targetUrl = new URL(gasUrl);
     targetUrl.searchParams.set('action', 'set_user_setting');
     targetUrl.searchParams.set('user_id', String(userId));
+    if (userName) targetUrl.searchParams.set('user_name', userName);
     targetUrl.searchParams.set('key', key);
     targetUrl.searchParams.set('value', String(value));
     targetUrl.searchParams.set('_t', Date.now().toString());
@@ -171,7 +173,8 @@ export async function syncUserSettingToGAS(
  */
 export async function syncUserLangToGAS(
   userId?: number | string,
-  lang?: 'uk' | 'ru'
+  lang?: 'uk' | 'ru',
+  userName?: string
 ): Promise<void> {
   if (!userId || !lang) return;
   const gasUrl = getGasApiUrl();
@@ -181,6 +184,7 @@ export async function syncUserLangToGAS(
     const targetUrl = new URL(gasUrl);
     targetUrl.searchParams.set('action', 'set_user_lang');
     targetUrl.searchParams.set('user_id', String(userId));
+    if (userName) targetUrl.searchParams.set('user_name', userName);
     targetUrl.searchParams.set('lang', lang);
     targetUrl.searchParams.set('_t', Date.now().toString());
 
@@ -311,7 +315,9 @@ export async function fetchChargesFromGAS(weekId: string = getWeekId()): Promise
 export async function toggleChargeGAS(
   weekId: string,
   deviceKey: DeviceKey,
-  newStatus: boolean
+  newStatus: boolean,
+  userId?: number | string,
+  userName?: string
 ): Promise<void> {
   const fullKey = `CHG_${weekId}_${deviceKey}`;
 
@@ -334,6 +340,8 @@ export async function toggleChargeGAS(
     targetUrl.searchParams.set('week', weekId);
     targetUrl.searchParams.set('item', deviceKey);
     targetUrl.searchParams.set('status', newStatus ? 'true' : 'false');
+    if (userId) targetUrl.searchParams.set('user_id', String(userId));
+    if (userName) targetUrl.searchParams.set('user_name', userName);
     targetUrl.searchParams.set('_t', Date.now().toString());
 
     await fetch(targetUrl.toString());
@@ -345,7 +353,12 @@ export async function toggleChargeGAS(
 /**
  * Mark all devices for a given list as charged
  */
-export async function chargeAllGAS(weekId: string, deviceKeys: DeviceKey[]): Promise<void> {
+export async function chargeAllGAS(
+  weekId: string,
+  deviceKeys: DeviceKey[],
+  userId?: number | string,
+  userName?: string
+): Promise<void> {
   // 1. Optimistic local update
   const current = getLocalCharges(weekId);
   for (const key of deviceKeys) {
@@ -362,6 +375,8 @@ export async function chargeAllGAS(weekId: string, deviceKeys: DeviceKey[]): Pro
     targetUrl.searchParams.set('action', 'charge_all');
     targetUrl.searchParams.set('week', weekId);
     targetUrl.searchParams.set('items', deviceKeys.join(','));
+    if (userId) targetUrl.searchParams.set('user_id', String(userId));
+    if (userName) targetUrl.searchParams.set('user_name', userName);
     targetUrl.searchParams.set('_t', Date.now().toString());
 
     await fetch(targetUrl.toString());

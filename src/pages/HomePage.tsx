@@ -11,6 +11,7 @@ import { triggerSideCannonsConfetti } from '../utils/confetti';
 import type { DeviceKey } from '../types';
 
 interface HomePageProps {
+  userId?: number | string;
   userName?: string;
   onNavigateToSchedule: () => void;
   chargesCount: { charged: number; total: number };
@@ -20,6 +21,7 @@ interface HomePageProps {
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
+  userId,
   userName,
   onNavigateToSchedule,
   chargesCount: _initialChargesCount,
@@ -141,7 +143,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       } catch (_) {}
     }
 
-    toggleChargeGAS(weekId, deviceKey, newStatus).catch(() => {});
+    toggleChargeGAS(weekId, deviceKey, newStatus, userId, userName).catch(() => {});
   };
 
   const handleChargeAll = () => {
@@ -161,7 +163,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       return updated;
     });
 
-    chargeAllGAS(weekId, items).catch(() => {});
+    chargeAllGAS(weekId, items, userId, userName).catch(() => {});
   };
 
   // Initial estimate: 96px icon centered horizontally, ~110px below header
