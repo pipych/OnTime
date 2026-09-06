@@ -161,13 +161,13 @@ export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
       {/* Top Header: Week Range (e.g. 07.09 — 13.09) + Week Navigation Buttons */}
       <div className="flex items-center justify-between">
         <div className="flex items-baseline gap-1.5 xs:gap-2">
-          <span className="text-[30px] xs:text-[34px] sm:text-[38px] font-black text-ios-text tracking-tight leading-none">
+          <span className="text-[26px] xs:text-[30px] sm:text-[34px] font-black text-ios-text tracking-tight leading-none">
             {startStr}
           </span>
-          <span className="text-[26px] xs:text-[30px] sm:text-[34px] font-bold text-ios-text tracking-tight leading-none">
+          <span className="text-[22px] xs:text-[26px] sm:text-[30px] font-bold text-ios-text tracking-tight leading-none">
             —
           </span>
-          <span className="text-[30px] xs:text-[34px] sm:text-[38px] font-black text-ios-text tracking-tight leading-none">
+          <span className="text-[26px] xs:text-[30px] sm:text-[34px] font-black text-ios-text tracking-tight leading-none">
             {endStr}
           </span>
         </div>
@@ -220,28 +220,28 @@ export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
             <div
               key={day.isoDate}
               className={clsx(
-                "flex flex-col py-3.5 px-4 transition-colors",
+                "flex flex-col py-2 px-3.5 sm:py-2.5 sm:px-4 transition-colors",
                 day.isToday && "bg-ios-accent/[0.06] dark:bg-ios-accent/[0.10]"
               )}
             >
               {/* Row 1: Short Day of Week in red + Employee Name right beside it */}
-              <div className="flex items-baseline gap-2.5">
-                <span className="text-[20px] sm:text-[21px] font-bold text-ios-red leading-tight w-8 shrink-0">
+              <div className="flex items-baseline gap-2">
+                <span className="text-[16px] sm:text-[16.5px] font-bold text-ios-red leading-snug w-[26px] shrink-0">
                   {day.shortName}
                 </span>
                 {formattedShift ? (
-                  <span className="text-[18px] sm:text-[19px] font-semibold text-ios-text leading-tight truncate">
+                  <span className="text-[15px] sm:text-[15.5px] font-semibold text-ios-text leading-snug truncate">
                     {formattedShift}
                   </span>
                 ) : (
-                  <span className="text-[16px] sm:text-[17px] italic text-ios-textSecondary leading-tight">
+                  <span className="text-[13.5px] sm:text-[14px] italic text-ios-textSecondary leading-snug">
                     {t.noShiftScheduled}
                   </span>
                 )}
               </div>
 
               {/* Row 2: Date number below */}
-              <span className="text-[14px] font-medium text-ios-textSecondary mt-0.5 leading-tight">
+              <span className="text-[12px] font-medium text-ios-textSecondary leading-none mt-0.5">
                 {dateLabel}
               </span>
             </div>
