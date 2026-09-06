@@ -220,12 +220,12 @@ export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
             <div
               key={day.isoDate}
               className={clsx(
-                "flex flex-col py-2 px-3.5 sm:py-2.5 sm:px-4 transition-colors",
+                "flex items-center justify-between py-2.5 px-3.5 sm:px-4 transition-colors gap-3",
                 day.isToday && "bg-ios-accent/[0.06] dark:bg-ios-accent/[0.10]"
               )}
             >
-              {/* Row 1: Short Day of Week in red + Employee Name right beside it */}
-              <div className="flex items-baseline gap-2">
+              {/* Left: Short Day of Week in red + Employee Name right beside it */}
+              <div className="flex items-baseline gap-2 min-w-0">
                 <span className="text-[16px] sm:text-[16.5px] font-bold text-ios-red leading-snug w-[26px] shrink-0">
                   {day.shortName}
                 </span>
@@ -240,8 +240,8 @@ export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
                 )}
               </div>
 
-              {/* Row 2: Date number below */}
-              <span className="text-[12px] font-medium text-ios-textSecondary leading-none mt-0.5">
+              {/* Right: Date number */}
+              <span className="text-[13px] sm:text-[13.5px] font-medium text-ios-textSecondary leading-none shrink-0 text-right tabular-nums">
                 {dateLabel}
               </span>
             </div>
