@@ -210,7 +210,7 @@ export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
       </div>
 
       {/* Week Schedule List Card */}
-      <div className="rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark p-4 sm:p-5 transition-all">
+      <div className="rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark px-4 sm:px-5 py-2 sm:py-2.5 transition-all">
         <div className="divide-y divide-black/[0.05] dark:divide-white/[0.05]">
           {weekDays.map((day) => {
             const rawShift = getShiftForDay(currentSchedule, day.dayOfWeek);
@@ -221,8 +221,8 @@ export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
               <div
                 key={day.isoDate}
                 className={clsx(
-                  "py-3 px-2 flex items-center justify-between transition-colors gap-3 rounded-xl",
-                  day.isToday && "bg-ios-accent/[0.06] dark:bg-ios-accent/[0.10] px-2.5"
+                  "py-3 px-1 flex items-center justify-between transition-colors gap-3",
+                  day.isToday && "bg-ios-accent/[0.06] dark:bg-ios-accent/[0.10]"
                 )}
               >
                 {/* Left: Short Day of Week in red + Employee Name right beside it */}
