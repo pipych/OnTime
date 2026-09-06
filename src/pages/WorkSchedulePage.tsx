@@ -226,15 +226,15 @@ export const WorkSchedulePage: React.FC<WorkSchedulePageProps> = ({
             >
               {/* Left: Short Day of Week in red + Employee Name right beside it */}
               <div className="flex items-baseline gap-2 min-w-0">
-                <span className="text-[16px] sm:text-[16.5px] font-bold text-ios-red leading-snug w-[26px] shrink-0">
+                <span className="text-[16px] sm:text-[16.5px] font-bold text-ios-red leading-snug w-[28px] shrink-0">
                   {day.shortName}
                 </span>
                 {formattedShift ? (
-                  <span className="text-[15px] sm:text-[15.5px] font-semibold text-ios-text leading-snug truncate">
+                  <span className="text-[16.5px] sm:text-[17px] font-semibold text-ios-text leading-snug truncate">
                     {formattedShift}
                   </span>
                 ) : (
-                  <span className="text-[13.5px] sm:text-[14px] italic text-ios-textSecondary leading-snug">
+                  <span className="text-[15px] sm:text-[15.5px] italic text-ios-textSecondary leading-snug">
                     {t.noShiftScheduled}
                   </span>
                 )}
