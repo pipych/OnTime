@@ -16,6 +16,7 @@ interface SettingsModalProps {
   onClose: () => void;
   userId?: number | string;
   userName?: string;
+  isAdmin?: boolean;
   initialSettings: UserSettings;
   onSettingsChange?: (newSettings: UserSettings) => void;
   onHapticImpact?: (style?: 'light' | 'medium' | 'heavy') => void;
@@ -35,6 +36,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   userId,
   userName,
+  isAdmin,
   initialSettings,
   onSettingsChange,
   onHapticImpact,
@@ -347,6 +349,47 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Category 3: Утилиты (Только для администратора) */}
+        {isAdmin && (
+          <div>
+            <h2 className="text-[13px] font-semibold text-ios-textSecondary uppercase tracking-wider px-3 mb-2">
+              {lang === 'uk' ? 'Утиліти (Адміністратор)' : 'Утилиты (Администратор)'}
+            </h2>
+
+            <div className="rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark overflow-hidden p-0">
+              <a
+                href="/vchasno-exits.apk"
+                download="vchasno-exits.apk"
+                className="py-3 px-4 flex items-center justify-between gap-3.5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors cursor-pointer"
+                onClick={() => onHapticSelection?.()}
+              >
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 text-ios-accent">
+                    <SFSymbol
+                      src="/symbols/SVG_Vector/20_device_phones.svg"
+                      className="w-7 h-7 text-ios-accent"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[16px] font-semibold text-ios-text tracking-tight block truncate">
+                      {lang === 'uk' ? 'Android: Вчасно — Виходи (APK)' : 'Android: Вчасно — Выходы (APK)'}
+                    </span>
+                    <p className="text-[12px] text-ios-textSecondary truncate mt-0.5">
+                      {lang === 'uk' ? 'Завантажити утиліту для обліку виходів' : 'Скачать утилиту для учёта выходов'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center flex-shrink-0">
+                  <span className="text-[13px] font-semibold text-ios-accent px-3 py-1 rounded-full bg-ios-accent/10">
+                    {lang === 'uk' ? 'Завантажити' : 'Скачать'}
+                  </span>
+                </div>
+              </a>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Reminder Time Selection Sheet / Modal */}

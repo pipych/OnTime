@@ -202,6 +202,7 @@ function AppContent() {
         onClose={() => setIsSettingsOpen(false)}
         userId={user?.id}
         userName={userName}
+        isAdmin={isAdmin}
         initialSettings={userSettings}
         onSettingsChange={(newSettings) => setUserSettings(newSettings)}
         onHapticImpact={hapticImpact}
