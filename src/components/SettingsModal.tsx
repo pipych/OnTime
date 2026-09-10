@@ -359,10 +359,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             <div className="rounded-ios bg-ios-card shadow-ios-card dark:shadow-ios-card-dark overflow-hidden p-0">
               <a
-                href="/vchasno-exits.apk"
-                download="vchasno-exits.apk"
+                href="https://github.com/pipych/OnTime/releases/download/v1.0.0/vchasno-exits.apk"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="py-3 px-4 flex items-center justify-between gap-3.5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors cursor-pointer"
-                onClick={() => onHapticSelection?.()}
+                onClick={(e) => {
+                  onHapticSelection?.();
+                  const directUrl = 'https://github.com/pipych/OnTime/releases/download/v1.0.0/vchasno-exits.apk';
+                  if (window.Telegram?.WebApp?.openLink) {
+                    e.preventDefault();
+                    window.Telegram.WebApp.openLink(directUrl);
+                  }
+                }}
               >
                 <div className="flex items-center gap-3.5 min-w-0">
                   <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 text-ios-accent">
