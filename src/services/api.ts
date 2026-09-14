@@ -37,15 +37,19 @@ export function saveLocalUserSettings(settings: Partial<UserSettings>): UserSett
 }
 
 export const DEFAULT_GAS_API_URL =
-  'https://script.google.com/macros/s/AKfycby9jVlbmoAnf48T2nMd5a_RYZXGGo38sWYsDgUrUoSDp5Oku2drTK-59Udna76FWIhq/exec';
+  'https://vchasno-backend.artemakimov2018.workers.dev/';
 
 // Returns configured GAS URL or the active production bot deployment URL
 export function getGasApiUrl(): string {
   if (typeof window === 'undefined') return DEFAULT_GAS_API_URL;
   const stored = localStorage.getItem(GAS_URL_KEY);
-  if (stored && stored.trim().length > 15) return stored.trim();
+  if (stored && stored.trim().length > 15 && !stored.includes('script.google.com')) {
+    return stored.trim();
+  }
   const envUrl = (import.meta as any).env?.VITE_GAS_API_URL;
-  if (envUrl && envUrl.trim().length > 15) return envUrl.trim();
+  if (envUrl && envUrl.trim().length > 15 && !envUrl.includes('script.google.com')) {
+    return envUrl.trim();
+  }
   return DEFAULT_GAS_API_URL;
 }
 
