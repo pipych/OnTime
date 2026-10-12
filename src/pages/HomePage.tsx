@@ -70,7 +70,7 @@ export const HomePage: React.FC<HomePageProps> = ({
     for (let d = 1; d <= 6; d++) {
       const items = CHARGE_DAYS_MAP[d] || [];
       for (const item of items) {
-        if (!charges[`CHG_${weekId}_${item}`] && !uncharged.includes(item)) {
+        if (!charges[`CHG_${weekId}_${item}`] && !charges[item] && !uncharged.includes(item)) {
           uncharged.push(item);
         }
       }
@@ -96,7 +96,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   const totalCount = todayItems.length;
   const chargedCount = todayItems.filter(
-    (i) => charges[`CHG_${weekId}_${i.key}`]
+    (i) => charges[`CHG_${weekId}_${i.key}`] || charges[i.key]
   ).length;
   const isAllCharged = totalCount > 0 && chargedCount === totalCount;
 
@@ -119,15 +119,17 @@ export const HomePage: React.FC<HomePageProps> = ({
     userInteractedRef.current = true;
     onHapticImpact?.('medium');
     const fullKey = `CHG_${weekId}_${deviceKey}`;
-    const newStatus = !charges[fullKey];
+    const newStatus = !(charges[fullKey] || charges[deviceKey]);
 
     // Optimistic UI with clean deletion when unchecking
     setCharges((prev) => {
       const updated = { ...prev };
       if (newStatus) {
         updated[fullKey] = true;
+        updated[deviceKey] = true;
       } else {
         delete updated[fullKey];
+        delete updated[deviceKey];
       }
       return updated;
     });
@@ -413,7 +415,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               {todayItems.map(({ key, isSundayDebt }) => {
                 const device = DEVICES[key];
                 if (!device) return null;
-                const isCharged = !!charges[`CHG_${weekId}_${key}`];
+                const isCharged = !!(charges[`CHG_${weekId}_${key}`] || charges[key]);
                 const deviceName = lang === 'uk' ? device.nameUk : device.nameRu;
 
                 return (

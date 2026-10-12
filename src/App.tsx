@@ -100,7 +100,7 @@ function AppContent() {
 
     let charged = 0;
     for (const key of todayItems) {
-      if (local[`CHG_${weekId}_${key}`]) {
+      if (local[`CHG_${weekId}_${key}`] || local[key]) {
         charged++;
       }
     }

@@ -105,7 +105,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
     for (let day = 1; day <= 6; day++) {
       const items = CHARGE_DAYS_MAP[day] || [];
       for (const item of items) {
-        if (!charges[`CHG_${currentWeekId}_${item}`] && !uncharged.includes(item)) {
+        if (!charges[`CHG_${currentWeekId}_${item}`] && !charges[item] && !uncharged.includes(item)) {
           uncharged.push(item);
         }
       }
@@ -127,7 +127,7 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
 
   const selectedTotalCount = selectedDayItems.length;
   const selectedChargedCount = selectedDayItems.filter(
-    (k) => charges[`CHG_${currentWeekId}_${k}`]
+    (k) => charges[`CHG_${currentWeekId}_${k}`] || charges[k]
   ).length;
   const isSelectedAllCharged = selectedTotalCount > 0 && selectedChargedCount === selectedTotalCount;
   const selectedPercent = selectedTotalCount > 0
@@ -221,15 +221,17 @@ export const SchedulePage: React.FC<SchedulePageProps> = ({
   const handleToggleDevice = (deviceKey: DeviceKey) => {
     onHapticImpact?.('medium');
     const fullKey = `CHG_${currentWeekId}_${deviceKey}`;
-    const newStatus = !charges[fullKey];
+    const newStatus = !(charges[fullKey] || charges[deviceKey]);
 
     // Optimistic UI with clean deletion when unchecking
     setCharges((prev) => {
       const updated = { ...prev };
       if (newStatus) {
         updated[fullKey] = true;
+        updated[deviceKey] = true;
       } else {
         delete updated[fullKey];
+        delete updated[deviceKey];
       }
       return updated;
     });

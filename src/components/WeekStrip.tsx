@@ -65,7 +65,7 @@ export const WeekStrip: React.FC<WeekStripProps> = ({
 
     let chargedCount = 0;
     for (const key of items) {
-      if (charges[`CHG_${day.weekId}_${key}`]) {
+      if (charges[`CHG_${day.weekId}_${key}`] || charges[key]) {
         chargedCount++;
       }
     }

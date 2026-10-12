@@ -43,7 +43,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
   // Statistics
   const totalCount = itemsToDisplay.length;
   const chargedCount = itemsToDisplay.filter(
-    (i) => charges[`CHG_${day.weekId}_${i.key}`]
+    (i) => charges[`CHG_${day.weekId}_${i.key}`] || charges[i.key]
   ).length;
   const isAllCharged = totalCount > 0 && chargedCount === totalCount;
 
@@ -103,7 +103,7 @@ export const DeviceChecklist: React.FC<DeviceChecklistProps> = ({
           const device = DEVICES[key];
           if (!device) return null;
 
-          const isCharged = !!charges[`CHG_${day.weekId}_${key}`];
+          const isCharged = !!(charges[`CHG_${day.weekId}_${key}`] || charges[key]);
           const deviceName = lang === 'uk' ? device.nameUk : device.nameRu;
           const targetDayOfWeek = isSundayDebt
             ? (DEVICE_DAY_MAP[key] ?? day.dayOfWeek)

@@ -35,7 +35,7 @@ export function getWeekId(dateObj?: Date): string {
   const year = d.getFullYear();
   const firstJan = new Date(d.getFullYear(), 0, 1);
   const weekNum = Math.ceil((((d.getTime() - firstJan.getTime()) / 86400000) + 1) / 7);
-  return `${year}_W${weekNum}`;
+  return `${year}_W${String(weekNum).padStart(2, '0')}`;
 }
 
 export function formatISODate(d: Date): string {

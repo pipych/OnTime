@@ -286,6 +286,14 @@ export async function fetchWeeklyDataFromGAS(weekId: string = getWeekId()): Prom
       for (const [key, value] of Object.entries(data.charges)) {
         if (value === 'true' || value === (true as any)) {
           parsedCharges[key] = true;
+          if (!key.startsWith('CHG_')) {
+            parsedCharges[`CHG_${weekId}_${key}`] = true;
+          } else {
+            const parts = key.split('_ITEM_');
+            if (parts.length === 2) {
+              parsedCharges['ITEM_' + parts[1]] = true;
+            }
+          }
         }
       }
       saveLocalCharges(weekId, parsedCharges);
@@ -329,8 +337,10 @@ export async function toggleChargeGAS(
   const current = getLocalCharges(weekId);
   if (newStatus) {
     current[fullKey] = true;
+    current[deviceKey] = true;
   } else {
     delete current[fullKey];
+    delete current[deviceKey];
   }
   saveLocalCharges(weekId, current);
 
@@ -367,6 +377,7 @@ export async function chargeAllGAS(
   const current = getLocalCharges(weekId);
   for (const key of deviceKeys) {
     current[`CHG_${weekId}_${key}`] = true;
+    current[key] = true;
   }
   saveLocalCharges(weekId, current);
 
